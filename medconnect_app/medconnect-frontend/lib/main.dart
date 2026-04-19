@@ -1,0 +1,122 @@
+import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'package:flutter_localizations/flutter_localizations.dart';
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+import 'package:provider/provider.dart';
+import 'view_models/patient_auth_view_model.dart';
+import 'view_models/doctor_auth_view_model.dart';
+import 'view_models/patient/patient_dashboard_view_model.dart';
+import 'view_models/patient/appointment_view_model.dart';
+import 'view_models/patient/patient_profile_view_model.dart';
+import 'view_models/patient/medical_document_view_model.dart';
+import 'view_models/patient/medical_record_view_model.dart';
+import 'view_models/auth_view_model.dart';
+<<<<<<< HEAD
+import 'view_models/doctor_dashboard_view_model.dart';
+=======
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+import 'views/auth/combined_login_screen.dart';
+import 'repositories/auth_repository.dart';
+import 'services/auth_service.dart';
+import 'services/api_auth_service.dart';
+<<<<<<< HEAD
+import 'services/appointment_service.dart';
+import 'repositories/appointment_repository.dart';
+import 'view_models/doctor_appointment_view_model.dart';
+import 'view_models/doctor_profile_view_model.dart';
+import 'repositories/doctor_repository.dart';
+import 'view_models/doctor_patients_view_model.dart';
+import 'repositories/doctor_patient_repository.dart';
+import 'view_models/doctor_medical_record_view_model.dart';
+import 'view_models/doctor_medical_document_view_model.dart';
+=======
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final AuthService authService = ApiAuthService();
+    final AuthRepository authRepository = AuthRepository(authService);
+
+    // Legacy support if needed
+    final AuthViewModel authViewModel = AuthViewModel(authRepository);
+
+    // New ViewModels
+    final PatientAuthViewModel patientAuthViewModel = PatientAuthViewModel(
+      authRepository,
+    );
+    final DoctorAuthViewModel doctorAuthViewModel = DoctorAuthViewModel(
+      authRepository,
+    );
+<<<<<<< HEAD
+    // DoctorDashboardViewModel
+    final DoctorDashboardViewModel doctorDashboardViewModel = DoctorDashboardViewModel();
+
+    final AppointmentService appointmentService = AppointmentService();
+    final AppointmentRepository appointmentRepository = AppointmentRepository(appointmentService);
+    final DoctorAppointmentViewModel doctorAppointmentViewModel = DoctorAppointmentViewModel(appointmentRepository);
+
+=======
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+    final PatientDashboardViewModel patientDashboardViewModel =
+        PatientDashboardViewModel();
+    final AppointmentViewModel appointmentViewModel = AppointmentViewModel();
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => authViewModel),
+        ChangeNotifierProvider(create: (_) => patientAuthViewModel),
+        ChangeNotifierProvider(create: (_) => doctorAuthViewModel),
+<<<<<<< HEAD
+        ChangeNotifierProvider(create: (_) => doctorDashboardViewModel),
+=======
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+        ChangeNotifierProvider(create: (_) => patientDashboardViewModel),
+        ChangeNotifierProvider(create: (_) => appointmentViewModel),
+        ChangeNotifierProvider(create: (_) => PatientProfileViewModel()),
+        ChangeNotifierProvider(create: (_) => MedicalDocumentViewModel()),
+        ChangeNotifierProvider(create: (_) => MedicalRecordViewModel()),
+<<<<<<< HEAD
+        ChangeNotifierProvider(create: (_) => doctorAppointmentViewModel),
+        ChangeNotifierProvider(create: (_) => DoctorProfileViewModel(DoctorRepository())),
+        ChangeNotifierProvider(create: (_) => DoctorPatientsViewModel(DoctorPatientRepository())),
+        ChangeNotifierProvider(create: (_) => DoctorMedicalRecordViewModel()),
+        ChangeNotifierProvider(create: (_) => DoctorMedicalDocumentViewModel()),
+=======
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+      ],
+      child: MaterialApp(
+        title: 'MedConnect',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          scaffoldBackgroundColor: const Color(0xFFF5F9FC),
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+              .copyWith(
+                primary: const Color(0xFF567991),
+                secondary: const Color(0xFF86B7D7),
+              ),
+        ),
+<<<<<<< HEAD
+=======
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('fr'), // French
+        ],
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+        home: const CombinedLoginScreen(),
+      ),
+    );
+  }
+}

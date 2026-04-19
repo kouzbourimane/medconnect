@@ -1,0 +1,67 @@
+name: medconnect_app
+description: "Application de gestion médicale MedConnect"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.10.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+<<<<<<< HEAD
+=======
+  flutter_localizations:
+    sdk: flutter
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+
+  # Pour l'état (State Management) - Provider
+  provider: ^6.1.1
+  # Pour les requêtes HTTP
+  http: ^1.1.0
+
+  dio: ^5.3.0
+  # Pour la sérialisation JSON (convertir JSON <-> Objet Dart)
+  json_annotation: ^4.8.1
+<<<<<<< HEAD
+=======
+  # pour les préférences partagées
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+  shared_preferences: ^2.2.2
+
+  # Icônes iOS
+  cupertino_icons: ^1.0.8
+  # pour les liens
+  url_launcher: ^6.3.2
+  # pour les dates
+  intl: ^0.20.2
+  # pour les fichiers
+  file_picker: ^10.3.8
+  # pour les documents
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  path_provider: ^2.1.5
+<<<<<<< HEAD
+=======
+  flutter_cached_pdfview: ^0.4.3
+  permission_handler: ^12.0.1
+  open_file: ^3.5.10
+>>>>>>> 21b118e356682c0277daf70006db17122b794da3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Pour la génération de code
+  build_runner: ^2.4.0
+  json_serializable: ^6.7.0
+
+  # Lints
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Pour ajouter des assets plus tard
+  # assets:
+  #   - images/
