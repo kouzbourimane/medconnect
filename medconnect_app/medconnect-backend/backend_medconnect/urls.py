@@ -2,10 +2,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from app.views import api_home
 
 urlpatterns = [
+    path('', api_home, name='api-home'),
     path('admin/', admin.site.urls),
-    path('', include('app.urls')), 
+    path('', include('app.urls')),
 ]
 
 if settings.DEBUG:
