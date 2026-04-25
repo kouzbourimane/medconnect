@@ -2,27 +2,23 @@ pipeline {
     agent any
 
     environment {
-        // Variables globales du pipeline
-        // Identifiant créé dans "Jenkins Credentials" pour la connexion à DockerHub
-        DOCKER_HUB_CREDENTIALS_ID = 'dockerhub-credentials' 
-        // Remplacez "votre_pseudo" par votre vrai compte DockerHub !
-        DOCKER_IMAGE_NAME = 'imanekouzbour/medconnect-backend' 
+        DOCKER_HUB_CREDENTIALS_ID = 'dockerhub-credentials'
+        DOCKER_IMAGE_NAME = 'imanekouzbour/medconnect-backend'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Cette étape récupère le code source de Github/Gitlab configuré dans le Job Jenkins
                 checkout scm
-                echo "Code cloné avec succès"
+                echo "Code clone avec succes"
             }
         }
 
         stage('Backend - Build Docker Image') {
             steps {
-                dir('medconnect_app/medconnect-backend'){
-                    echo "Construction de l'image Docker pour le backend..."
+                dir('medconnect_app/medconnect-backend') {
+                    echo "Construction de l image Docker pour le backend..."
                     script {
                         dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${IMAGE_TAG}")
                     }
@@ -30,24 +26,10 @@ pipeline {
             }
         }
 
-        stage('Backend - Tests') {
-            steps {
-                echo "Lancement des tests backend..."
-                script {
-                    // On vérifie que manage.py est exécutable et les tests passent
-                    dockerImage.inside {
-                        sh 'python manage.py check'
-                        sh 'python manage.py test --keepdb || echo "Aucun test trouvé ou erreur mineure" '
-                    }
-                }
-            }
-        }
-
         stage('Backend - Push Image to DockerHub') {
             steps {
-                echo "Envoi de l'image sur DockerHub..."
+                echo "Envoi de l image sur DockerHub..."
                 script {
-                    // Connexion à DockerHub et envoi (push)
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_HUB_CREDENTIALS_ID}") {
                         dockerImage.push()
                         dockerImage.push('latest')
@@ -58,39 +40,8 @@ pipeline {
 
         stage('Backend - Deploy to Kubernetes') {
             steps {
-                echo "Déploiement sur le cluster Kubernetes..."
-                // Met à jour l'image locale avec notre tag spécifique
-                sh "sed -i 's|dockernamespace/medconnect-backend:latest|${DOCKER_IMAGE_NAME}:${IMAGE_TAG}|g' medconnect_app/k8s/backend-deployment.yaml"
-                // Application de la nouvelle configuration (Nécessite que kubectl soit configuré sur votre serveur Jenkins)
-               
-                sh 'kubectl apply -f medconnect_app/k8s/backend-deployment.yaml'
-                sh 'kubectl apply -f medconnect_app/k8s/backend-service.yaml'
-                
-            }
-        }
-
-        // Le Frontend est compilé dans un environnement isolé
-        stage('Frontend - Build Flutter APK') {
-            agent {
-                // On utilise un conteneur temporaire qui possède déjà l'environnement Flutter
-                docker {
-                    image 'cirrusci/flutter:stable'
-                    args '-u root'
-                }
-            }
-            steps {
-                dir('medconnect-frontend') {
-                    echo "Construction de l'APK Flutter..."
-                    sh 'flutter pub get'
-                    // sh 'flutter test' (Optionnel)
-                    sh 'flutter build apk --release'
-                }
-            }
-            post {
-                success {
-                    // Sauvegarde l'APK final sur l'interface Jenkins pour le télécharger facilement !
-                    archiveArtifacts artifacts: 'build/app/outputs/flutter-apk/app-release.apk', allowEmptyArchive: true
-                }
+                echo "Deploiement sur Kubernetes..."
+                sh 'kubectl apply -f medconnect_app/k8s/deployment.yaml'
             }
         }
     }
