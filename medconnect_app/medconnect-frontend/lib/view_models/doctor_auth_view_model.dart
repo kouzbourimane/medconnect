@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:medconnect_app/repositories/auth_repository.dart';
+import 'package:medconnect_app/models/auth_response.dart';
 
 class DoctorAuthViewModel with ChangeNotifier {
   final AuthRepository _authRepository;

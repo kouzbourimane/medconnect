@@ -1,19 +1,10 @@
-<<<<<<< HEAD
-=======
-import 'utilisateur.dart';
-
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
-class PatientProfileModel {
+﻿class PatientProfileModel {
   final String? bloodType;
   final String? allergies;
   final String? emergencyContact;
   final String? emergencyPhone;
   final double? height;
   final double? weight;
-<<<<<<< HEAD
-=======
-  final Utilisateur? user;
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
   PatientProfileModel({
     this.bloodType,
@@ -22,10 +13,6 @@ class PatientProfileModel {
     this.emergencyPhone,
     this.height,
     this.weight,
-<<<<<<< HEAD
-=======
-    this.user,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   });
 
   factory PatientProfileModel.fromJson(Map<String, dynamic> json) {
@@ -40,10 +27,6 @@ class PatientProfileModel {
       weight: json['weight'] != null
           ? (json['weight'] as num).toDouble()
           : null,
-<<<<<<< HEAD
-=======
-      user: json['user'] != null ? Utilisateur.fromJson(json['user']) : null,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     );
   }
 

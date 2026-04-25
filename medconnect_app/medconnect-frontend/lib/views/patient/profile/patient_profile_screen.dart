@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/patient/patient_profile_view_model.dart';
 import '../../../view_models/patient_auth_view_model.dart';
@@ -33,12 +33,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
   Widget build(BuildContext context) {
     final profileVM = context.watch<PatientProfileViewModel>();
     final authVM = context.watch<PatientAuthViewModel>();
-<<<<<<< HEAD
     final user = authVM.authResponse?.user;
-=======
-    // Prefer the updated user data from profileVM, fall back to authVM if profile hasn't loaded yet
-    final user = profileVM.profileData?.user ?? authVM.authResponse?.user;
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FC),
@@ -98,21 +93,6 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                               "Téléphone",
                               user?.phone ?? "Non renseigné",
                             ),
-<<<<<<< HEAD
-=======
-                            const Divider(),
-                            _buildInfoRow(
-                              Icons.calendar_today,
-                              "Date de naissance",
-                              user?.dateOfBirth ?? "Non renseigné",
-                            ),
-                            const Divider(),
-                            _buildInfoRow(
-                              Icons.home,
-                              "Adresse",
-                              user?.address ?? "Non renseigné",
-                            ),
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
                           ],
                         ),
                       ),

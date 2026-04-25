@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/patient_auth_view_model.dart';
 import '../../../services/doctor_service.dart';
 import '../../../view_models/patient/appointment_view_model.dart';
 import '../../../models/doctor.dart';
-<<<<<<< HEAD
-=======
-import '../doctor_detail_screen.dart';
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
 class BookAppointmentScreen extends StatefulWidget {
   const BookAppointmentScreen({Key? key}) : super(key: key);
@@ -25,11 +21,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   DateTime? _selectedDate;
   String? _selectedTime;
   final TextEditingController _reasonController = TextEditingController();
-<<<<<<< HEAD
-=======
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = "";
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
   // Services
   final DoctorService _doctorService = DoctorService();
@@ -42,11 +33,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   bool _isLoadingSlots = false;
   String? _slotError;
 
-<<<<<<< HEAD
-=======
-  bool _isConfirming = false;
-
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   @override
   void initState() {
     super.initState();
@@ -58,29 +44,9 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   @override
   void dispose() {
     _reasonController.dispose();
-<<<<<<< HEAD
     super.dispose();
   }
 
-=======
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  List<Doctor> get _filteredDoctors {
-    return _doctors.where((doc) {
-      final matchesSearch =
-          _searchQuery.isEmpty ||
-          doc.firstName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          doc.lastName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          doc.speciality.toLowerCase().contains(_searchQuery.toLowerCase());
-
-      // Filter by availability and active status
-      return matchesSearch && doc.isAvailable && doc.isActive;
-    }).toList();
-  }
-
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   Future<void> _fetchDoctors() async {
     setState(() => _isLoadingDoctors = true);
     try {
@@ -122,7 +88,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             padding: const EdgeInsets.only(top: 20.0),
             child: Row(
               children: [
-<<<<<<< HEAD
                 ElevatedButton(
                   onPressed: details.onStepContinue,
                   style: ElevatedButton.styleFrom(
@@ -133,21 +98,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 ),
                 const SizedBox(width: 12),
                 if (_currentStep > 0)
-=======
-                if (_isConfirming)
-                  const CircularProgressIndicator()
-                else
-                  ElevatedButton(
-                    onPressed: details.onStepContinue,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF567991),
-                      foregroundColor: Colors.white,
-                    ),
-                    child: Text(_currentStep == 2 ? 'Confirmer' : 'Suivant'),
-                  ),
-                const SizedBox(width: 12),
-                if (_currentStep > 0 && !_isConfirming)
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
                   TextButton(
                     onPressed: details.onStepCancel,
                     child: const Text(
@@ -428,7 +378,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
   }
 
   Future<void> _confirmAppointment() async {
-<<<<<<< HEAD
     // Vérification plus robuste
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -451,43 +400,12 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
       return;
     }
 
-=======
-    if (_isConfirming) return;
-
-    // Vérification plus robuste
-    if (_selectedDate == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Date non sélectionnée")));
-      return;
-    }
-
-    if (_selectedTime == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Heure non sélectionnée")));
-      return;
-    }
-
-    if (_selectedDoctorId == null || _selectedDoctor == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Médecin non sélectionné")));
-      return;
-    }
-
-    setState(() {
-      _isConfirming = true;
-    });
-
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     try {
       // Parse time avec validation
       final parts = _selectedTime!.split(':');
       if (parts.length != 2) {
         throw FormatException("Format d'heure invalide");
       }
-<<<<<<< HEAD
       
       final hour = int.tryParse(parts[0]);
       final minute = int.tryParse(parts[1]);
@@ -496,16 +414,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         throw FormatException("Heure invalide");
       }
       
-=======
-
-      final hour = int.tryParse(parts[0]);
-      final minute = int.tryParse(parts[1]);
-
-      if (hour == null || minute == null) {
-        throw FormatException("Heure invalide");
-      }
-
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
       final dt = DateTime(
         _selectedDate!.year,
         _selectedDate!.month,
@@ -514,33 +422,16 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         minute,
       );
 
-<<<<<<< HEAD
       final viewModel = Provider.of<AppointmentViewModel>(context, listen: false);
-=======
-      final viewModel = Provider.of<AppointmentViewModel>(
-        context,
-        listen: false,
-      );
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
       final authViewModel = Provider.of<PatientAuthViewModel>(
         context,
         listen: false,
       );
-<<<<<<< HEAD
       
       final token = authViewModel.authResponse?.token;
       if (token == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Session expirée, veuillez vous reconnecter")),
-=======
-
-      final token = authViewModel.authResponse?.token;
-      if (token == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Session expirée, veuillez vous reconnecter"),
-          ),
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
         );
         return;
       }
@@ -549,7 +440,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         token,
         _selectedDoctorId!, // Assurez-vous que c'est un int
         dt,
-<<<<<<< HEAD
         _reasonController.text.isNotEmpty ? _reasonController.text : "Consultation générale",
       );
 
@@ -569,37 +459,6 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Erreur: ${e.toString()}")),
         );
-=======
-        _reasonController.text.isNotEmpty
-            ? _reasonController.text
-            : "Consultation générale",
-      );
-
-      if (success && mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("Rendez-vous confirmé !")));
-        Navigator.pop(context);
-      } else if (mounted) {
-        // If it was just a duplicate submission caught late or something similar,
-        // we might not want to show an error if it actually succeeded before.
-        // But here we rely on viewModel returning false.
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Erreur: ${viewModel.error}")));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString()}")));
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isConfirming = false;
-        });
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
       }
     }
   }

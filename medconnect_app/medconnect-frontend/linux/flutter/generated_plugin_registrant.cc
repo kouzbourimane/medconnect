@@ -6,20 +6,14 @@
 
 #include "generated_plugin_registrant.h"
 
-<<<<<<< HEAD
-=======
 #include <open_file_linux/open_file_linux_plugin.h>
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 #include <printing/printing_plugin.h>
 #include <url_launcher_linux/url_launcher_plugin.h>
 
 void fl_register_plugins(FlPluginRegistry* registry) {
-<<<<<<< HEAD
-=======
   g_autoptr(FlPluginRegistrar) open_file_linux_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "OpenFileLinuxPlugin");
   open_file_linux_plugin_register_with_registrar(open_file_linux_registrar);
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   g_autoptr(FlPluginRegistrar) printing_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "PrintingPlugin");
   printing_plugin_register_with_registrar(printing_registrar);

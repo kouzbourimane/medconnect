@@ -103,8 +103,15 @@ class RegisterPatientSerializer(serializers.Serializer):
         
         # Créer l'utilisateur
         password = validated_data.pop('password')
+        
+        # S'assurer que first_name et last_name ne sont pas None (NOT NULL constraint)
+        first_name = validated_data.pop('first_name', '') or ''
+        last_name = validated_data.pop('last_name', '') or ''
+        
         user = User.objects.create(
             **validated_data,
+            first_name=first_name,
+            last_name=last_name,
             role=User.Roles.PATIENT,
             is_active=True
         )
@@ -168,8 +175,15 @@ class RegisterDoctorSerializer(serializers.Serializer):
         
         # Créer l'utilisateur
         password = validated_data.pop('password')
+        
+        # S'assurer que first_name et last_name ne sont pas None (NOT NULL constraint)
+        first_name = validated_data.pop('first_name', '') or ''
+        last_name = validated_data.pop('last_name', '') or ''
+        
         user = User.objects.create(
             **validated_data,
+            first_name=first_name,
+            last_name=last_name,
             address=address,
             role=User.Roles.DOCTOR,
             is_active=True

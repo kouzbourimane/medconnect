@@ -1,4 +1,4 @@
-import 'package:http/http.dart' as storage;
+﻿import 'package:http/http.dart' as storage;
 
 import 'auth_service.dart';
 import '../models/register_request.dart';
@@ -15,14 +15,11 @@ class ApiAuthService implements AuthService {
   }
 
   @override
-<<<<<<< HEAD
   Future<AuthResponse> registerDoctor(Map<String, dynamic> data) async {
     return await _apiService.registerDoctor(data);
   }
 
   @override
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   Future<AuthResponse> loginPatient(String email, String password) async {
     return await _apiService.loginPatient(email, password);
   }

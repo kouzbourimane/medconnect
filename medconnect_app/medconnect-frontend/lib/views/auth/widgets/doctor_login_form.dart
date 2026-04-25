@@ -1,13 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/doctor_auth_view_model.dart';
-<<<<<<< HEAD
 import '../register_doctor_screen.dart';
 import '../../doctor/doctor_dashboard_screen.dart';
-=======
-// If doctor registration exists, import it here. For now no register link for doctor requested or implied as strictly managed.
-// User only asked for Patient Register link usage.
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
 class DoctorLoginForm extends StatefulWidget {
   const DoctorLoginForm({Key? key}) : super(key: key);
@@ -154,16 +149,12 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
                             const SnackBar(content: Text('Connexion réussie')),
                           );
                           // Navigate to dashboard
-<<<<<<< HEAD
                            Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => const DoctorDashboardScreen(),
                             ),
                           );
-=======
-                          // Navigator.pushReplacementNamed(context, '/doctor_dashboard');
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
                         }
                       }
                     },
@@ -193,7 +184,6 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
                     ),
             ),
           ),
-<<<<<<< HEAD
 
           const SizedBox(height: 20),
 
@@ -221,8 +211,6 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
               ),
             ],
           ),
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
         ],
       ),
     );

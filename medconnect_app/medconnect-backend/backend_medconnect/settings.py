@@ -99,6 +99,20 @@ DATABASES = {
 }
 
 
+db_password = os.getenv('DB_PASSWORD', '')
+use_sqlite = os.getenv('USE_SQLITE', '').lower() in ['true', '1', 'yes'] or not db_password
+
+if use_sqlite:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    DATABASES['default']['PASSWORD'] = db_password
+
+
 # ===== VALIDATION DES MOTS DE PASSE =====
 
 AUTH_PASSWORD_VALIDATORS = [

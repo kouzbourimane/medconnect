@@ -1,4 +1,4 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+﻿// GENERATED CODE - DO NOT MODIFY BY HAND
 
 part of 'register_request.dart';
 
@@ -19,11 +19,6 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       allergies: json['allergies'] as String?,
       emergency_contact: json['emergency_contact'] as String?,
       emergency_phone: json['emergency_phone'] as String?,
-<<<<<<< HEAD
-=======
-      dateOfBirth: json['date_of_birth'] as String?,
-      address: json['address'] as String?,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     );
 
 Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
@@ -39,9 +34,4 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'allergies': instance.allergies,
       'emergency_contact': instance.emergency_contact,
       'emergency_phone': instance.emergency_phone,
-<<<<<<< HEAD
-=======
-      'date_of_birth': instance.dateOfBirth,
-      'address': instance.address,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     };
