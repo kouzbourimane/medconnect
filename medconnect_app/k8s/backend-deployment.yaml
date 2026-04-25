@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: medconnect-backend
+  labels:
+    app: medconnect-backend
+spec:
+  replicas: 2 # Nombre de pods (instances) à maintenir en vie
+  selector:
+    matchLabels:
+      app: medconnect-backend
+  template:
+    metadata:
+      labels:
+        app: medconnect-backend
+    spec:
+      containers:
+      - name: medconnect-backend
+        image: imanekouzbour/medconnect-backend:latest # L'image qui sera pushée par Jenkins
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: DEBUG
+          value: "True"
+        # Décommentez et ajustez si vous utilisez Postgres externe dans K8s
+        # - name: DB_ENGINE
+        #   value: "django.db.backends.postgresql"
+        # - name: DB_NAME
+        #   value: "medconnect_db"
+        # - name: DB_USER
+        #   value: "postgres"
+        # - name: DB_PASSWORD
+        #   value: "password"
+        # - name: DB_HOST
+        #   value: "postgres-service"
