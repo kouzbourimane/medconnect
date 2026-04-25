@@ -39,7 +39,7 @@ class Speciality(models.Model):
 
 # Modèle pour les médecins (extension de User)
 class DoctorProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'role': User.Roles.DOCTOR})
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     speciality = models.ForeignKey(Speciality, on_delete=models.SET_NULL, null=True, blank=True)
     license_number = models.CharField(max_length=50, unique=True)
     city = models.CharField(max_length=100, blank=True, null=True)
