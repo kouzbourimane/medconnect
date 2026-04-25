@@ -15,6 +15,18 @@ from .serializers import (
 )
 from .permissions import IsAgentOrSuperAdmin
 
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def api_home(request):
+    return Response({
+        "message": "MedConnect backend is running.",
+        "admin_url": "/admin/",
+        "api_root": "/api/",
+        "login_url": "/api/auth/login/",
+        "patient_dashboard_url": "/api/patient/dashboard/",
+    })
+
 # Vues d'authentification
 class AuthViewSet(viewsets.GenericViewSet):
     permission_classes = [AllowAny]
