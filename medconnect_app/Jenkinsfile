@@ -41,7 +41,8 @@ pipeline {
         stage('Backend - Deploy to Kubernetes') {
             steps {
                 echo "Deploiement sur Kubernetes..."
-                sh 'kubectl apply -f medconnect_app/k8s/deployment.yaml'
+                sh 'kubectl apply -f medconnect_app/k8s/backend-deployment.yaml'
+                sh 'kubectl apply -f medconnect_app/k8s/backend-service.yaml'
             }
         }
     }
