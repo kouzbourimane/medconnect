@@ -1,8 +1,5 @@
-import 'dart:io';
-<<<<<<< HEAD
+﻿import 'dart:io';
 import 'dart:typed_data';
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 import 'package:flutter/foundation.dart';
 import '../../models/medical_document_model.dart';
 import '../../services/document_service.dart';
@@ -64,13 +61,9 @@ class MedicalDocumentViewModel with ChangeNotifier {
 
   Future<void> uploadDocument({
     required String token,
-<<<<<<< HEAD
     File? file,
     Uint8List? fileBytes,
     String? fileName,
-=======
-    required File file,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     required String title,
     required String documentType,
     String? description,
@@ -83,11 +76,8 @@ class MedicalDocumentViewModel with ChangeNotifier {
       final newDoc = await _documentService.uploadDocument(
         token: token,
         file: file,
-<<<<<<< HEAD
         fileBytes: fileBytes,
         fileName: fileName,
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
         title: title,
         documentType: documentType,
         description: description,

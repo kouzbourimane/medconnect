@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../models/register_request.dart';
 import '../../view_models/auth_view_model.dart';
@@ -23,12 +23,6 @@ class _RegisterPatientScreenState extends State<RegisterPatientScreen> {
   final _allergiesController = TextEditingController();
   final _emergencyContactController = TextEditingController();
   final _emergencyPhoneController = TextEditingController();
-<<<<<<< HEAD
-=======
-  final _addressController = TextEditingController();
-  final _dateOfBirthController = TextEditingController();
-  DateTime? _selectedDateOfBirth;
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
   String? _selectedBloodType;
   final List<String> _bloodTypes = [
@@ -225,67 +219,6 @@ class _RegisterPatientScreenState extends State<RegisterPatientScreen> {
                         keyboardType: TextInputType.phone,
                       ),
                       const SizedBox(height: 12),
-<<<<<<< HEAD
-=======
-                      TextFormField(
-                        controller: _addressController,
-                        decoration: _buildInputDecoration(
-                          'Adresse',
-                          Icons.home,
-                          primaryColor,
-                        ),
-                        maxLines: 2,
-                      ),
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () async {
-                          final DateTime? picked = await showDatePicker(
-                            context: context,
-                            initialDate:
-                                _selectedDateOfBirth ??
-                                DateTime.now().subtract(
-                                  const Duration(days: 365 * 18),
-                                ),
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime.now(),
-                            locale: const Locale("fr", "FR"),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: const ColorScheme.light(
-                                    primary: primaryColor,
-                                    onPrimary: Colors.white,
-                                    onSurface: Colors.black,
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                          );
-                          if (picked != null) {
-                            setState(() {
-                              _selectedDateOfBirth = picked;
-                              _dateOfBirthController.text =
-                                  "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
-                            });
-                          }
-                        },
-                        child: AbsorbPointer(
-                          child: TextFormField(
-                            controller: _dateOfBirthController,
-                            decoration: _buildInputDecoration(
-                              'Date de naissance',
-                              Icons.calendar_today,
-                              primaryColor,
-                            ),
-                            validator: (value) => value == null || value.isEmpty
-                                ? 'Requis'
-                                : null,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
                       DropdownButtonFormField<String>(
                         value: _selectedBloodType,
                         decoration: _buildInputDecoration(
@@ -384,16 +317,6 @@ class _RegisterPatientScreenState extends State<RegisterPatientScreen> {
                                         _emergencyPhoneController.text.isEmpty
                                         ? null
                                         : _emergencyPhoneController.text,
-<<<<<<< HEAD
-=======
-                                    address: _addressController.text.isEmpty
-                                        ? null
-                                        : _addressController.text,
-                                    dateOfBirth:
-                                        _dateOfBirthController.text.isEmpty
-                                        ? null
-                                        : _dateOfBirthController.text,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
                                   );
 
                                   final success = await authViewModel

@@ -95,20 +95,10 @@ class SpecialityAdmin(admin.ModelAdmin):
 class DoctorProfileAdmin(admin.ModelAdmin):
     """Administration des profils médecins."""
     
-    list_display = ('get_full_name', 'speciality', 'license_number', 
-                   'is_available', 'consultation_fee', 'years_of_experience')
-    list_filter = ('speciality', 'is_available', 'years_of_experience')
-    search_fields = ('user__username', 'user__first_name', 'user__last_name', 
-                    'license_number', 'speciality__name')
-    raw_id_fields = ('user', 'speciality')
+    list_display = ('user', 'speciality', 'license_number')
+    list_filter = ('speciality', 'is_available')
+    search_fields = ('user__username', 'license_number', 'speciality__name')
     list_per_page = 20
-    list_editable = ('is_available', 'consultation_fee')
-    
-    def get_full_name(self, obj):
-        """Affiche le nom complet du médecin."""
-        return obj.user.get_full_name() or obj.user.username
-    get_full_name.short_description = _("Médecin")
-    get_full_name.admin_order_field = 'user__last_name'
 
 @admin.register(PatientProfile)
 class PatientProfileAdmin(admin.ModelAdmin):

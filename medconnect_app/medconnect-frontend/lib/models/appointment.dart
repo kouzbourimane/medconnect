@@ -1,5 +1,4 @@
-class Appointment {
-<<<<<<< HEAD
+﻿class Appointment {
   static const String statusPending = 'En attente';
   static const String statusConfirmed = 'Confirmé';
   static const String statusCancelled = 'Annulé';
@@ -11,47 +10,28 @@ class Appointment {
   final int patientId; // Added for matching history
   final String doctorName;
   final String patientName;
-=======
-  final int id;
-  final int doctorId;
-  final String doctorName;
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   final String specialty;
   final String date;
   final int duration;
   final String status;
   final String? reason;
   final String? notesPatient;
-<<<<<<< HEAD
 
   // Computed properties
   DateTime get dateTime => DateTime.parse(date);
-=======
-  final String? createdAt; // Pour le tri des annulés
-
-  // Computed properties
-  DateTime get dateTime => DateTime.parse(date);
-  DateTime? get createdDate =>
-      createdAt != null ? DateTime.parse(createdAt!) : null;
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
   Appointment({
     required this.id,
     required this.doctorId,
-<<<<<<< HEAD
     required this.patientId,
     required this.doctorName,
     required this.patientName,
-=======
-    required this.doctorName,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     required this.specialty,
     required this.date,
     required this.duration,
     required this.status,
     this.reason,
     this.notesPatient,
-<<<<<<< HEAD
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -105,23 +85,6 @@ class Appointment {
       status: status ?? this.status,
       reason: reason,
       notesPatient: notesPatient,
-=======
-    this.createdAt,
-  });
-
-  factory Appointment.fromJson(Map<String, dynamic> json) {
-    return Appointment(
-      id: json['id'],
-      doctorId: json['doctor'],
-      doctorName: json['doctor_name'] ?? 'Inconnu',
-      specialty: json['specialty'] ?? 'Général',
-      date: json['date'],
-      duration: json['duration'] ?? 30,
-      status: json['status'],
-      reason: json['reason'],
-      notesPatient: json['notes_patient'],
-      createdAt: json['created_at'],
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     );
   }
 }

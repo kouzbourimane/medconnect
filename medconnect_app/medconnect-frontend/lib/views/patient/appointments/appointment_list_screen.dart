@@ -1,9 +1,5 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:medconnect_app/views/patient/appointments/book_appointment_screen.dart';
-<<<<<<< HEAD
-=======
-import 'package:medconnect_app/views/patient/appointments/appointment_detail_screen.dart'; // Correct import path assumption or relative
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 import 'package:provider/provider.dart';
 import '../../../view_models/patient/appointment_view_model.dart';
 import '../../../view_models/patient_auth_view_model.dart';
@@ -91,13 +87,9 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
         onPressed: () {
           Navigator.push(
             context,
-<<<<<<< HEAD
             MaterialPageRoute(
               builder: (_) => const BookAppointmentScreen(),
             ),
-=======
-            MaterialPageRoute(builder: (_) => const BookAppointmentScreen()),
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
           );
         },
         backgroundColor: const Color(0xFF567991),
@@ -120,7 +112,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-<<<<<<< HEAD
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: const Color(0xFF567991).withOpacity(0.1),
@@ -152,50 +143,6 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
               ],
             ),
             trailing: _buildStatusBadge(appt.status),
-=======
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AppointmentDetailScreen(appointment: appt),
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(12),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: const Color(0xFF567991).withOpacity(0.1),
-                child: const Icon(
-                  Icons.medical_services,
-                  color: Color(0xFF567991),
-                ),
-              ),
-              title: Text(
-                appt.doctorName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(appt.specialty),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_today,
-                        size: 14,
-                        color: Colors.grey,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(appt.date.replaceAll('T', ' ').substring(0, 16)),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: _buildStatusBadge(appt.status),
-            ),
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
           ),
         );
       },

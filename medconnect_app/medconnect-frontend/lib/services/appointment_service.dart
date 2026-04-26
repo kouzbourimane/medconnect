@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/appointment.dart';
 import 'api_service.dart';
@@ -52,25 +52,15 @@ class AppointmentService {
       );
     }
   }
-<<<<<<< HEAD
   Future<Appointment> updateStatus(String token, int id, String status) async {
     final url = Uri.parse('${ApiService.apiPrefix}/appointments/$id/');
     // Typically PATCH or PUT for status update
     final response = await http.patch(
-=======
-
-  Future<void> cancelAppointment(String token, int appointmentId) async {
-    final url = Uri.parse(
-      '${ApiService.apiPrefix}/appointments/$appointmentId/cancel/',
-    );
-    final response = await http.post(
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
       url,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Token $token',
       },
-<<<<<<< HEAD
       body: json.encode({
         'status': status,
       }),
@@ -100,13 +90,6 @@ class AppointmentService {
       return Appointment.fromJson(json.decode(response.body));
     } else {
       throw Exception('Erreur lors de la modification du rendez-vous');
-=======
-    );
-
-    if (response.statusCode != 200) {
-      final body = json.decode(response.body);
-      throw Exception(body['error'] ?? 'Impossible d\'annuler le rendez-vous');
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     }
   }
 }

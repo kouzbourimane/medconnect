@@ -1,4 +1,4 @@
-import 'package:json_annotation/json_annotation.dart';
+﻿import 'package:json_annotation/json_annotation.dart';
 
 part 'register_request.g.dart';
 
@@ -15,12 +15,6 @@ class RegisterRequest {
   final String? allergies;
   final String? emergency_contact;
   final String? emergency_phone;
-<<<<<<< HEAD
-=======
-  @JsonKey(name: 'date_of_birth')
-  final String? dateOfBirth;
-  final String? address;
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
   RegisterRequest({
     required this.username,
@@ -34,18 +28,9 @@ class RegisterRequest {
     this.allergies,
     this.emergency_contact,
     this.emergency_phone,
-<<<<<<< HEAD
-=======
-    this.dateOfBirth,
-    this.address,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   });
 
   factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
       _$RegisterRequestFromJson(json);
   Map<String, dynamic> toJson() => _$RegisterRequestToJson(this);
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 21b118e356682c0277daf70006db17122b794da3

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import '../models/register_request.dart';
 import '../models/auth_response.dart';
 import '../repositories/auth_repository.dart';
@@ -41,7 +41,6 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
-<<<<<<< HEAD
   Future<bool> registerDoctor(Map<String, dynamic> payload) async {
     _isLoading = true;
     _errorMessage = null;
@@ -64,8 +63,6 @@ class AuthViewModel with ChangeNotifier {
     }
   }
 
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   // Connexion (Legacy/Generic - defaulting to Patient or deprecated)
   // Utiliser PatientAuthViewModel ou DoctorAuthViewModel pour les nouvelles implémentations.
   Future<void> login(String email, String password) async {

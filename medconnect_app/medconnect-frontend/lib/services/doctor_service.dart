@@ -1,11 +1,8 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'api_service.dart';
 import '../models/doctor.dart';
-<<<<<<< HEAD
 import '../repositories/doctor_repository.dart';
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
 class DoctorService {
   Future<Map<String, dynamic>> getAvailability(
@@ -18,7 +15,6 @@ class DoctorService {
       '${ApiService.apiPrefix}/doctors/$doctorId/availability/?date=$dateStr',
     );
 
-<<<<<<< HEAD
     try {
       final response = await http.get(
         url,
@@ -37,20 +33,6 @@ class DoctorService {
     } catch (e) {
       print("Erreur réseau disponibilité: $e");
       return {'slots': []};
-=======
-    final response = await http.get(
-      url,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Token $token',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('Erreur de chargement des disponibilités');
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     }
   }
 

@@ -154,7 +154,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
                     const SizedBox(width: 16),
                     const Icon(Icons.access_time, size: 16, color: Colors.grey),
                     const SizedBox(width: 4),
-                    Text(appt.date.split('T')[1].substring(0, 5)),
+                    Text('${appt.date.split('T')[1].substring(0, 5)} (${appt.duration} min)'),
                   ],
                 ),
                 if (isPending) ...[

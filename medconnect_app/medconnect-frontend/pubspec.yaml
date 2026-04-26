@@ -9,11 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-<<<<<<< HEAD
-=======
   flutter_localizations:
     sdk: flutter
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
   # Pour l'état (State Management) - Provider
   provider: ^6.1.1
@@ -23,10 +20,7 @@ dependencies:
   dio: ^5.3.0
   # Pour la sérialisation JSON (convertir JSON <-> Objet Dart)
   json_annotation: ^4.8.1
-<<<<<<< HEAD
-=======
   # pour les préférences partagées
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   shared_preferences: ^2.2.2
 
   # Icônes iOS
@@ -41,12 +35,9 @@ dependencies:
   pdf: ^3.11.3
   printing: ^5.14.2
   path_provider: ^2.1.5
-<<<<<<< HEAD
-=======
   flutter_cached_pdfview: ^0.4.3
   permission_handler: ^12.0.1
   open_file: ^3.5.10
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
 dev_dependencies:
   flutter_test:

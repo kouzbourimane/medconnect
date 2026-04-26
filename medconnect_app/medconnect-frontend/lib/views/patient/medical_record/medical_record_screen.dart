@@ -1,14 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../../view_models/patient/medical_record_view_model.dart';
 import '../../../view_models/patient_auth_view_model.dart';
-<<<<<<< HEAD
-=======
-import '../../common/document_viewer_screen.dart';
-import '../../../models/medical_document_model.dart';
-import '../../../services/document_download_service.dart';
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 import '../documents/widgets/document_widgets.dart';
 
 class MedicalRecordScreen extends StatefulWidget {
@@ -45,45 +39,6 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen>
     }
   }
 
-<<<<<<< HEAD
-=======
-  void _viewDocument(MedicalDocument doc) {
-    if (doc.fileUrl == null || doc.fileUrl!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('URL du document non disponible')),
-      );
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => DocumentViewerScreen(
-          url: doc.fileUrl!,
-          title: doc.title,
-          documentType: doc.documentType,
-        ),
-      ),
-    );
-  }
-
-  Future<void> _downloadDocument(MedicalDocument doc) async {
-    if (doc.fileUrl == null || doc.fileUrl!.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('URL du document non disponible')),
-      );
-      return;
-    }
-
-    final String fileName = doc.fileUrl!.split('/').last.split('?').first;
-    await DocumentDownloadService().downloadFile(
-      context,
-      doc.fileUrl!,
-      fileName.contains('.') ? fileName : '$fileName.pdf',
-    );
-  }
-
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -306,14 +261,9 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen>
         final doc = docs[index];
         return DocumentCard(
           document: doc,
-<<<<<<< HEAD
           onView:
               () {}, // Handled by DocumentsScreen usually, but could be added here
           onDownload: () {},
-=======
-          onView: () => _viewDocument(doc),
-          onDownload: () => _downloadDocument(doc),
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
         );
       },
     );

@@ -1,9 +1,6 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'dart:io';
-<<<<<<< HEAD
 import 'dart:typed_data';
-=======
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 import 'package:http/http.dart' as http;
 import '../models/medical_document_model.dart';
 import 'api_service.dart';
@@ -32,13 +29,9 @@ class DocumentService {
 
   Future<MedicalDocument> uploadDocument({
     required String token,
-<<<<<<< HEAD
     File? file,
     Uint8List? fileBytes,
     String? fileName,
-=======
-    required File file,
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
     required String title,
     required String documentType,
     String? description,
@@ -55,7 +48,6 @@ class DocumentService {
       request.fields['description'] = description;
     }
 
-<<<<<<< HEAD
     if (fileBytes != null) {
       // Web Upload
       request.files.add(http.MultipartFile.fromBytes(
@@ -69,9 +61,6 @@ class DocumentService {
     } else {
        throw Exception("Aucun fichier fourni");
     }
-=======
-    request.files.add(await http.MultipartFile.fromPath('file', file.path));
->>>>>>> 21b118e356682c0277daf70006db17122b794da3
 
     var streamedResponse = await request.send();
     var response = await http.Response.fromStream(streamedResponse);
