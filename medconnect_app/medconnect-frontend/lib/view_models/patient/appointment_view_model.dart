@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import '../../models/appointment.dart';
 import '../../services/appointment_service.dart';
 
@@ -13,17 +13,23 @@ class AppointmentViewModel with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  // Filtered lists
+  List<Appointment> get pendingAppointments {
+    return _appointments
+        .where((a) => a.status == Appointment.statusPending)
+        .toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
+  }
+
   List<Appointment> get upcomingAppointments {
     final now = DateTime.now();
     return _appointments
         .where(
           (a) =>
-              a.status != 'CANCELLED' &&
-              a.status != 'REJECTED' &&
+              a.status == Appointment.statusConfirmed &&
               a.dateTime.isAfter(now),
         )
-        .toList();
+        .toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
   }
 
   List<Appointment> get pastAppointments {
@@ -31,16 +37,15 @@ class AppointmentViewModel with ChangeNotifier {
     return _appointments
         .where(
           (a) =>
-              a.status == 'COMPLETED' ||
-              (a.status != 'CANCELLED' && a.dateTime.isBefore(now)),
+              a.status == Appointment.statusCompleted ||
+              a.status == Appointment.statusCancelled ||
+              a.status == Appointment.statusRefused ||
+              ((a.status == Appointment.statusPending ||
+                      a.status == Appointment.statusConfirmed) &&
+                  a.dateTime.isBefore(now)),
         )
-        .toList();
-  }
-
-  List<Appointment> get cancelledAppointments {
-    return _appointments
-        .where((a) => a.status == 'CANCELLED' || a.status == 'REJECTED')
-        .toList();
+        .toList()
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
   }
 
   Future<void> fetchAppointments(String token) async {
@@ -75,7 +80,30 @@ class AppointmentViewModel with ChangeNotifier {
         date,
         reason,
       );
-      await fetchAppointments(token); // Refresh list
+      await fetchAppointments(token);
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> cancelAppointment(String token, int appointmentId) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _appointmentService.cancelAppointment(token, appointmentId);
+      final index = _appointments.indexWhere((a) => a.id == appointmentId);
+      if (index != -1) {
+        _appointments[index] = _appointments[index].copyWith(
+          status: Appointment.statusCancelled,
+        );
+      }
       return true;
     } catch (e) {
       _error = e.toString().replaceAll('Exception: ', '');

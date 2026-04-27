@@ -312,7 +312,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                           backgroundColor: const Color(0xFFF5F9FC),
                           child: Icon(Icons.person, color: Colors.grey[600]),
                       ),
-                      title: Text(appt.doctorName, style: const TextStyle(fontWeight: FontWeight.bold)), // Using doctorName field for Patient Name
+                      title: Text(appt.patientName, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text("${appt.specialty} - ${appt.date.split('T')[1].substring(0, 5)}"), // Specialty as Type
                       trailing: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

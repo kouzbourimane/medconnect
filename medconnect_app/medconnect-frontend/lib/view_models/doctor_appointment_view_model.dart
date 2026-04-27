@@ -15,25 +15,80 @@ class DoctorAppointmentViewModel with ChangeNotifier {
   String? get error => _error;
   List<Appointment> get appointments => _appointments;
 
-  // Getters for filtered lists
-  List<Appointment> get pendingAppointments =>
-      _appointments.where((a) => a.status == Appointment.statusPending).toList();
+  // ─── Getters filtrés ────────────────────────────────────────────────────────
 
-  List<Appointment> get upcomingAppointments =>
-      _appointments.where((a) => a.status == Appointment.statusConfirmed && a.dateTime.isAfter(DateTime.now())).toList();
+  /// Demandes PENDING dont la date n'est pas encore dépassée
+  List<Appointment> get pendingAppointments => _appointments
+      .where((a) => a.status == Appointment.statusPending)
+      .toList()
+    ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
 
-  List<Appointment> get pastAppointments =>
-      _appointments.where((a) => a.status == Appointment.statusCompleted || a.status == Appointment.statusCancelled || (a.status == Appointment.statusConfirmed && a.dateTime.isBefore(DateTime.now()))).toList();
+  /// Demandes PENDING dont la date est dépassée (expirées — pour affichage dans "Demandes")
+  List<Appointment> get expiredPendingAppointments {
+    final now = DateTime.now();
+    return _appointments
+        .where(
+          (a) =>
+              a.status == Appointment.statusPending &&
+              a.dateTime.isBefore(now),
+        )
+        .toList()
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+  }
 
+  /// Toutes les demandes PENDING (actives + expirées)
+  List<Appointment> get allPendingAppointments {
+    return _appointments
+        .where((a) => a.status == Appointment.statusPending)
+        .toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
+  }
+
+  /// RDV confirmés à venir
+  List<Appointment> get upcomingAppointments {
+    final now = DateTime.now();
+    return _appointments
+        .where(
+          (a) =>
+              a.status == Appointment.statusConfirmed &&
+              a.dateTime.isAfter(now),
+        )
+        .toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
+  }
+
+  /// Historique : terminés, annulés, refusés, ou confirmés avec date passée
+  List<Appointment> get pastAppointments {
+    final now = DateTime.now();
+    return _appointments
+        .where(
+          (a) =>
+              a.status == Appointment.statusCompleted ||
+              a.status == Appointment.statusCancelled ||
+              a.status == Appointment.statusRefused ||
+              (a.status == Appointment.statusConfirmed &&
+                  a.dateTime.isBefore(now)),
+        )
+        .toList()
+      ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+  }
+
+  /// RDV d'aujourd'hui (confirmés)
   List<Appointment> get todayAppointments {
     final now = DateTime.now();
-    return _appointments.where((a) =>
-      a.status == Appointment.statusConfirmed &&
-      a.dateTime.year == now.year &&
-      a.dateTime.month == now.month &&
-      a.dateTime.day == now.day
-    ).toList();
+    return _appointments
+        .where(
+          (a) =>
+              a.status == Appointment.statusConfirmed &&
+              a.dateTime.year == now.year &&
+              a.dateTime.month == now.month &&
+              a.dateTime.day == now.day,
+        )
+        .toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
   }
+
+  // ─── Actions ────────────────────────────────────────────────────────────────
 
   Future<void> fetchAppointments(String token) async {
     _isLoading = true;
@@ -52,35 +107,38 @@ class DoctorAppointmentViewModel with ChangeNotifier {
 
   Future<void> acceptAppointment(String token, int id) async {
     try {
-      final updated = await _appointmentRepository.updateAppointmentStatus(token, id, Appointment.statusConfirmed);
+      final updated = await _appointmentRepository.updateAppointmentStatus(
+        token,
+        id,
+        Appointment.statusConfirmed,
+      );
       _updateLocalAppointment(updated);
     } catch (e) {
-       // Handle error (maybe show snackbar in UI)
-       rethrow;
+      rethrow;
     }
   }
 
-  Future<void> refuseAppointment(String token, int id) async {
+  Future<void> refuseAppointment(String token, int id, {String? reason}) async {
     try {
-      final updated = await _appointmentRepository.updateAppointmentStatus(token, id, Appointment.statusRefused);
-       _updateLocalAppointment(updated);
+      final updated = await _appointmentRepository.updateAppointmentStatus(
+        token,
+        id,
+        Appointment.statusRefused,
+        reason: reason,
+      );
+      _updateLocalAppointment(updated);
     } catch (e) {
-       rethrow;
+      rethrow;
     }
   }
 
   Future<void> cancelAppointment(String token, int id) async {
     try {
-      final updated = await _appointmentRepository.updateAppointmentStatus(token, id, Appointment.statusCancelled);
-       _updateLocalAppointment(updated);
-    } catch (e) {
-       rethrow;
-    }
-  }
-
-  Future<void> rescheduleAppointment(String token, int id, DateTime newDate) async {
-    try {
-      final updated = await _appointmentRepository.rescheduleAppointment(token, id, newDate);
+      final updated = await _appointmentRepository.updateAppointmentStatus(
+        token,
+        id,
+        Appointment.statusCancelled,
+      );
       _updateLocalAppointment(updated);
     } catch (e) {
       rethrow;

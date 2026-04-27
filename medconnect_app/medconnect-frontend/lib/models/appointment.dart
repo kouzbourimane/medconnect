@@ -16,6 +16,7 @@
   final String status;
   final String? reason;
   final String? notesPatient;
+  final String? refusalReason;
 
   // Computed properties
   DateTime get dateTime => DateTime.parse(date);
@@ -32,6 +33,7 @@
     required this.status,
     this.reason,
     this.notesPatient,
+    this.refusalReason,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -47,6 +49,9 @@
         break;
       case 'CANCELLED':
         displayStatus = statusCancelled;
+        break;
+      case 'REFUSED':
+        displayStatus = statusRefused;
         break;
       case 'COMPLETED':
         displayStatus = statusCompleted;
@@ -67,6 +72,7 @@
       status: displayStatus,
       reason: json['reason'],
       notesPatient: json['notes_patient'],
+      refusalReason: json['refusal_reason'],
     );
   }
 
@@ -85,6 +91,7 @@
       status: status ?? this.status,
       reason: reason,
       notesPatient: notesPatient,
+      refusalReason: refusalReason,
     );
   }
 }

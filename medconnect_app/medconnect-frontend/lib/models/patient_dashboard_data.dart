@@ -36,6 +36,7 @@ class PatientDashboardData {
 class DashboardAppointment {
   final int id;
   final String doctorName;
+  final String patientName;
   final String specialty;
   final String date;
   final String status;
@@ -43,6 +44,7 @@ class DashboardAppointment {
   DashboardAppointment({
     required this.id,
     required this.doctorName,
+    required this.patientName,
     required this.specialty,
     required this.date,
     required this.status,
@@ -52,6 +54,7 @@ class DashboardAppointment {
     return DashboardAppointment(
       id: json['id'],
       doctorName: json['doctor_name'] ?? 'Inconnu',
+      patientName: json['patient_name'] ?? json['doctor_name'] ?? 'Inconnu',
       specialty: json['specialty'] ?? 'Général',
       date: json['date'],
       status: json['status'],

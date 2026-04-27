@@ -1,10 +1,11 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status, generics, serializers
 from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
+from django.utils import timezone
 from datetime import datetime, time
 
 from .models import User, PatientProfile, DoctorProfile, MedicalDocument
@@ -632,4 +633,106 @@ class PatientMedicalRecordView(APIView):
         }
 
         return Response(response_data)
+
+
+class PatchedAppointmentViewSet(AppointmentViewSet):
+    def _create_notification(self, user, title, message):
+        from .models import Notification
+
+        Notification.objects.create(
+            user=user,
+            title=title,
+            message=message,
+            type='APPOINTMENT',
+        )
+
+    def _ensure_doctor_owner(self, request, appointment):
+        if not request.user.is_doctor() or appointment.doctor.user != request.user:
+            raise serializers.ValidationError("Action réservée au médecin concerné par ce rendez-vous.")
+
+    def _ensure_patient_owner(self, request, appointment):
+        if not request.user.is_patient() or appointment.patient.user != request.user:
+            raise serializers.ValidationError("Action réservée au patient concerné par ce rendez-vous.")
+
+    @action(detail=True, methods=['post'])
+    def accept(self, request, pk=None):
+        appointment = self.get_object()
+        self._ensure_doctor_owner(request, appointment)
+
+        if appointment.status != 'PENDING':
+            raise serializers.ValidationError("Seuls les rendez-vous en attente peuvent être acceptés.")
+        if appointment.date <= timezone.now():
+            raise serializers.ValidationError("Impossible d'accepter un rendez-vous dont la date est dépassée.")
+
+        appointment.status = 'CONFIRMED'
+        appointment.refusal_reason = None
+        appointment.save(update_fields=['status', 'refusal_reason', 'updated_at'])
+
+        self._create_notification(
+            appointment.patient.user,
+            "Rendez-vous confirmé",
+            f"Votre rendez-vous du {appointment.date:%Y-%m-%d à %H:%M} avec Dr. {appointment.doctor.user.get_full_name()} a été confirmé.",
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def refuse(self, request, pk=None):
+        appointment = self.get_object()
+        self._ensure_doctor_owner(request, appointment)
+
+        if appointment.status != 'PENDING':
+            raise serializers.ValidationError("Seuls les rendez-vous en attente peuvent être refusés.")
+
+        appointment.status = 'REFUSED'
+        appointment.refusal_reason = request.data.get('reason') or None
+        appointment.save(update_fields=['status', 'refusal_reason', 'updated_at'])
+
+        self._create_notification(
+            appointment.patient.user,
+            "Rendez-vous refusé",
+            f"Votre demande du {appointment.date:%Y-%m-%d à %H:%M} n'a pas pu être acceptée.",
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        appointment = self.get_object()
+
+        if request.user.is_doctor():
+            self._ensure_doctor_owner(request, appointment)
+            actor_label = "Le médecin"
+            target_user = appointment.patient.user
+        elif request.user.is_patient():
+            self._ensure_patient_owner(request, appointment)
+            actor_label = "Le patient"
+            target_user = appointment.doctor.user
+        else:
+            raise serializers.ValidationError("Vous n'avez pas le droit d'annuler ce rendez-vous.")
+
+        if appointment.status not in ['PENDING', 'CONFIRMED']:
+            raise serializers.ValidationError("Ce rendez-vous ne peut plus être annulé.")
+
+        appointment.status = 'CANCELLED'
+        appointment.save(update_fields=['status', 'updated_at'])
+
+        self._create_notification(
+            target_user,
+            "Rendez-vous annulé",
+            f"{actor_label} a annulé le rendez-vous prévu le {appointment.date:%Y-%m-%d à %H:%M}.",
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        appointment = self.get_object()
+        self._ensure_doctor_owner(request, appointment)
+
+        if appointment.status != 'CONFIRMED':
+            raise serializers.ValidationError("Seuls les rendez-vous confirmés peuvent être marqués comme terminés.")
+        if appointment.date > timezone.now():
+            raise serializers.ValidationError("Impossible de terminer un rendez-vous qui n'a pas encore eu lieu.")
+
+        appointment.status = 'COMPLETED'
+        appointment.save(update_fields=['status', 'updated_at'])
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
 

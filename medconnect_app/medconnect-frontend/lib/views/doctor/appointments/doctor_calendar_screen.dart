@@ -11,48 +11,91 @@ class DoctorCalendarScreen extends StatefulWidget {
   State<DoctorCalendarScreen> createState() => _DoctorCalendarScreenState();
 }
 
-class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
+class _DoctorCalendarScreenState extends State<DoctorCalendarScreen>
+    with SingleTickerProviderStateMixin {
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  DateTime _selectedDay = DateTime.now();
+  late TabController _viewTabController;
 
   @override
   void initState() {
     super.initState();
-    _selectedDay = _focusedDay;
+    _viewTabController = TabController(length: 2, vsync: this);
   }
 
-  List<Appointment> _getAppointmentsForDay(DateTime day) {
-    final viewModel = Provider.of<DoctorAppointmentViewModel>(context, listen: false);
-    return viewModel.appointments.where((appointment) {
-      return appointment.dateTime.year == day.year &&
-             appointment.dateTime.month == day.month &&
-             appointment.dateTime.day == day.day &&
-             appointment.status != Appointment.statusCancelled;
-    }).toList();
+  @override
+  void dispose() {
+    _viewTabController.dispose();
+    super.dispose();
+  }
+
+  List<Appointment> _getAppointmentsForDay(
+    DateTime day,
+    List<Appointment> appointments,
+  ) {
+    return appointments.where((a) {
+      return a.dateTime.year == day.year &&
+          a.dateTime.month == day.month &&
+          a.dateTime.day == day.day &&
+          a.status != Appointment.statusCancelled &&
+          a.status != Appointment.statusRefused;
+    }).toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Calendrier'),
-        backgroundColor: const Color(0xFF567991),
-      ),
-      body: Column(
-        children: [
-          _buildHeader(),
-          _buildDaysOfWeek(),
-          _buildCalendarGrid(),
-          const Divider(),
-          Expanded(child: _buildAppointmentList()),
-        ],
-      ),
+    // Consumer pour que le calendrier se reconstruise quand les données chargent
+    return Consumer<DoctorAppointmentViewModel>(
+      builder: (context, viewModel, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Calendrier'),
+            backgroundColor: const Color(0xFF567991),
+            bottom: TabBar(
+              controller: _viewTabController,
+              indicatorColor: Colors.white,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white.withOpacity(0.6),
+              tabs: const [
+                Tab(icon: Icon(Icons.grid_view), text: 'Mois'),
+                Tab(icon: Icon(Icons.view_agenda), text: 'Agenda'),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            controller: _viewTabController,
+            children: [
+              _buildMonthView(viewModel),
+              _buildAgendaView(viewModel),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ─── VUE MENSUELLE ─────────────────────────────────────────────────────────
+
+  Widget _buildMonthView(DoctorAppointmentViewModel viewModel) {
+    return Column(
+      children: [
+        _buildHeader(),
+        _buildDaysOfWeek(),
+        _buildCalendarGrid(viewModel),
+        const Divider(height: 1),
+        Expanded(
+          child: _buildDayAppointmentList(
+            _getAppointmentsForDay(_selectedDay, viewModel.appointments),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -60,7 +103,8 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
             icon: const Icon(Icons.chevron_left),
             onPressed: () {
               setState(() {
-                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
+                _focusedDay =
+                    DateTime(_focusedDay.year, _focusedDay.month - 1);
               });
             },
           ),
@@ -72,7 +116,8 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
             icon: const Icon(Icons.chevron_right),
             onPressed: () {
               setState(() {
-                _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1);
+                _focusedDay =
+                    DateTime(_focusedDay.year, _focusedDay.month + 1);
               });
             },
           ),
@@ -83,18 +128,35 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
 
   Widget _buildDaysOfWeek() {
     final days = ['LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM', 'DIM'];
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: days.map((day) => Text(day, style: const TextStyle(fontWeight: FontWeight.bold))).toList(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: days
+            .map(
+              (day) => Expanded(
+                child: Center(
+                  child: Text(
+                    day,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 11,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 
-  Widget _buildCalendarGrid() {
-    final daysInMonth = DateUtils.getDaysInMonth(_focusedDay.year, _focusedDay.month);
+  Widget _buildCalendarGrid(DoctorAppointmentViewModel viewModel) {
+    final daysInMonth =
+        DateUtils.getDaysInMonth(_focusedDay.year, _focusedDay.month);
     final firstDayOfMonth = DateTime(_focusedDay.year, _focusedDay.month, 1);
-    final int firstWeekday = firstDayOfMonth.weekday; // 1 = Mon, 7 = Sun
-    
-    // Calculate total slots needed (padding for start + days)
+    final int firstWeekday = firstDayOfMonth.weekday; // 1=Lun, 7=Dim
     final int totalSlots = daysInMonth + (firstWeekday - 1);
 
     return GridView.builder(
@@ -109,24 +171,30 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
         if (index < firstWeekday - 1) {
           return const SizedBox.shrink();
         }
-        
         final day = index - (firstWeekday - 1) + 1;
         final date = DateTime(_focusedDay.year, _focusedDay.month, day);
-        final isSelected = _selectedDay != null && isSameDay(_selectedDay!, date);
-        final appointments = _getAppointmentsForDay(date);
+        final isSelected = _isSameDay(_selectedDay, date);
+        final isToday = _isSameDay(DateTime.now(), date);
+        // Utiliser les données du viewModel passé en paramètre (listen: true via Consumer)
+        final dayAppointments =
+            _getAppointmentsForDay(date, viewModel.appointments);
+        final hasAppointments = dayAppointments.isNotEmpty;
 
         return GestureDetector(
           onTap: () {
             setState(() {
               _selectedDay = date;
+              _focusedDay = DateTime(date.year, date.month);
             });
           },
           child: Container(
-            margin: const EdgeInsets.all(4),
+            margin: const EdgeInsets.all(3),
             decoration: BoxDecoration(
               color: isSelected ? const Color(0xFF567991) : null,
               shape: BoxShape.circle,
-              border: isToday(date) && !isSelected ? Border.all(color: const Color(0xFF567991)) : null,
+              border: isToday && !isSelected
+                  ? Border.all(color: const Color(0xFF567991), width: 1.5)
+                  : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -134,14 +202,16 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
                 Text(
                   '$day',
                   style: TextStyle(
-                    color: isSelected ? Colors.white : Colors.black,
+                    color: isSelected ? Colors.white : Colors.black87,
+                    fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 13,
                   ),
                 ),
-                if (appointments.isNotEmpty)
+                if (hasAppointments)
                   Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    width: 6,
-                    height: 6,
+                    margin: const EdgeInsets.only(top: 2),
+                    width: 5,
+                    height: 5,
                     decoration: BoxDecoration(
                       color: isSelected ? Colors.white : Colors.orange,
                       shape: BoxShape.circle,
@@ -155,39 +225,247 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     );
   }
 
-  Widget _buildAppointmentList() {
-    if (_selectedDay == null) return const SizedBox.shrink();
-    
-    final appointments = _getAppointmentsForDay(_selectedDay!);
-    
+  Widget _buildDayAppointmentList(List<Appointment> appointments) {
     if (appointments.isEmpty) {
       return Center(
-        child: Text(
-          'Aucun rendez-vous pour le ${DateFormat('dd/MM/yyyy').format(_selectedDay!)}',
-          style: const TextStyle(color: Colors.grey),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.event_available, size: 48, color: Colors.grey),
+            const SizedBox(height: 8),
+            Text(
+              'Aucun RDV le ${DateFormat('EEEE dd MMMM', 'fr_FR').format(_selectedDay)}',
+              style: const TextStyle(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
       );
     }
 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          child: Text(
+            '${appointments.length} RDV — ${DateFormat('EEEE dd MMMM', 'fr_FR').format(_selectedDay)}',
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF567991),
+            ),
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            itemCount: appointments.length,
+            itemBuilder: (context, index) {
+              final appt = appointments[index];
+              return _buildAgendaCard(appt);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  // ─── VUE AGENDA ────────────────────────────────────────────────────────────
+
+  Widget _buildAgendaView(DoctorAppointmentViewModel viewModel) {
+    // Regrouper les RDV des 30 prochains jours par date
+    final now = DateTime.now();
+    final until = now.add(const Duration(days: 30));
+    final upcoming = viewModel.appointments
+        .where(
+          (a) =>
+              a.dateTime.isAfter(now.subtract(const Duration(days: 1))) &&
+              a.dateTime.isBefore(until) &&
+              a.status != Appointment.statusCancelled &&
+              a.status != Appointment.statusRefused,
+        )
+        .toList()
+      ..sort((a, b) => a.dateTime.compareTo(b.dateTime));
+
+    if (upcoming.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.event_busy, size: 64, color: Colors.grey),
+            SizedBox(height: 12),
+            Text(
+              'Aucun rendez-vous à venir\ndans les 30 prochains jours.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // Grouper par jour
+    final Map<String, List<Appointment>> byDay = {};
+    for (final appt in upcoming) {
+      final key = DateFormat('yyyy-MM-dd').format(appt.dateTime);
+      byDay.putIfAbsent(key, () => []).add(appt);
+    }
+
     return ListView.builder(
-      itemCount: appointments.length,
+      padding: const EdgeInsets.all(16),
+      itemCount: byDay.length,
       itemBuilder: (context, index) {
-        final appt = appointments[index];
-        return ListTile(
-          leading: Icon(Icons.access_time, color: Theme.of(context).primaryColor),
-          title: Text(appt.patientName),
-          subtitle: Text('${appt.date.split('T')[1].substring(0, 5)} (${appt.duration} min) - ${appt.status}'),
+        final dateKey = byDay.keys.elementAt(index);
+        final dayAppts = byDay[dateKey]!;
+        final date = DateTime.parse(dateKey);
+        final isToday = _isSameDay(date, DateTime.now());
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── En-tête du jour ──────────────────────────────────────
+            Container(
+              margin: const EdgeInsets.only(bottom: 8, top: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: isToday
+                    ? const Color(0xFF567991)
+                    : const Color(0xFF567991).withOpacity(0.08),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                isToday
+                    ? "Aujourd'hui — ${DateFormat('dd MMMM', 'fr_FR').format(date)}"
+                    : DateFormat('EEEE dd MMMM', 'fr_FR').format(date),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isToday ? Colors.white : const Color(0xFF567991),
+                  fontSize: 13,
+                ),
+              ),
+            ),
+            // ── RDV de ce jour ──────────────────────────────────────
+            ...dayAppts.map((appt) => _buildAgendaCard(appt)),
+            const SizedBox(height: 8),
+          ],
         );
       },
     );
   }
 
-  bool isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
+  Widget _buildAgendaCard(Appointment appt) {
+    final timeStr = appt.date.split('T')[1].substring(0, 5);
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      child: IntrinsicHeight(
+        child: Row(
+          children: [
+            // Bande colorée à gauche
+            Container(
+              width: 5,
+              decoration: BoxDecoration(
+                color: appt.status == Appointment.statusConfirmed
+                    ? Colors.green
+                    : Colors.orange,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  bottomLeft: Radius.circular(10),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                child: Row(
+                  children: [
+                    // Heure + durée
+                    SizedBox(
+                      width: 50,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            timeStr,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: Color(0xFF567991),
+                            ),
+                          ),
+                          Text(
+                            '${appt.duration}min',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const VerticalDivider(width: 20),
+                    // Infos patient
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            appt.patientName,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                          ),
+                          if (appt.reason != null && appt.reason!.isNotEmpty)
+                            Text(
+                              appt.reason!,
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                        ],
+                      ),
+                    ),
+                    // Statut
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: appt.status == Appointment.statusConfirmed
+                            ? Colors.green.withOpacity(0.1)
+                            : Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        appt.status == Appointment.statusConfirmed
+                            ? 'Confirmé'
+                            : 'En attente',
+                        style: TextStyle(
+                          color: appt.status == Appointment.statusConfirmed
+                              ? Colors.green
+                              : Colors.orange,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
-  bool isToday(DateTime date) {
-    final now = DateTime.now();
-    return isSameDay(date, now);
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 }

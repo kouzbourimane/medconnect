@@ -25,6 +25,13 @@ class PatientAuthViewModel with ChangeNotifier {
     try {
       _authResponse = await _authRepository.loginPatient(email, password);
 
+      if (_authResponse?.user?.role != 'PATIENT') {
+        _authResponse = null;
+        _errorMessage =
+            'Ce compte n\'est pas un compte patient. Connectez-vous depuis l\'espace médecin.';
+        return false;
+      }
+
       if (_authResponse?.token != null) {
         print('Patient Key received: ${_authResponse!.token}');
 
