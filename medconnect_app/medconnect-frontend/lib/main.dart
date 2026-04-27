@@ -22,6 +22,7 @@ import 'view_models/doctor_patients_view_model.dart';
 import 'repositories/doctor_patient_repository.dart';
 import 'view_models/doctor_medical_record_view_model.dart';
 import 'view_models/doctor_medical_document_view_model.dart';
+import 'view_models/messages_view_model.dart';
 
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
     final PatientDashboardViewModel patientDashboardViewModel =
         PatientDashboardViewModel();
     final AppointmentViewModel appointmentViewModel = AppointmentViewModel();
+    final MessagesViewModel messagesViewModel = MessagesViewModel();
 
     return MultiProvider(
       providers: [
@@ -68,6 +70,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => doctorDashboardViewModel),
         ChangeNotifierProvider(create: (_) => patientDashboardViewModel),
         ChangeNotifierProvider(create: (_) => appointmentViewModel),
+        ChangeNotifierProvider(create: (_) => messagesViewModel),
         ChangeNotifierProvider(create: (_) => PatientProfileViewModel()),
         ChangeNotifierProvider(create: (_) => MedicalDocumentViewModel()),
         ChangeNotifierProvider(create: (_) => MedicalRecordViewModel()),
