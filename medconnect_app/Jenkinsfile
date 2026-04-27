@@ -5,6 +5,8 @@ pipeline {
         DOCKER_HUB_CREDENTIALS_ID = 'dockerhub-credentials'
         DOCKER_IMAGE_NAME = 'imanekouzbour/medconnect-backend'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
+        FIREBASE_TOKEN = credentials('firebase-token')
+        FIREBASE_APP_ID = '1:621469238732:android:ead2ba093a5c9907f80969'
     }
 
     stages {
@@ -43,6 +45,29 @@ pipeline {
                 echo "Deploiement sur Kubernetes..."
                 sh 'kubectl apply -f medconnect_app/k8s/backend-deployment.yaml'
                 sh 'kubectl apply -f medconnect_app/k8s/backend-service.yaml'
+            }
+        }
+
+        stage('Frontend - Build APK') {
+            steps {
+                echo "Construction de l APK Flutter..."
+                dir('medconnect_app/medconnect-frontend') {
+                    sh 'flutter pub get'
+                    sh 'flutter build apk --release'
+                }
+            }
+        }
+
+        stage('Frontend - Deploy Firebase') {
+            steps {
+                echo "Deploiement sur Firebase App Distribution..."
+                sh """
+                    npx firebase appdistribution:distribute \
+                    medconnect_app/medconnect-frontend/build/app/outputs/flutter-apk/app-release.apk \
+                    --app ${FIREBASE_APP_ID} \
+                    --token ${FIREBASE_TOKEN} \
+                    --release-notes "Build ${IMAGE_TAG} - Deploiement automatique"
+                """
             }
         }
     }
