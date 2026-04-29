@@ -7,6 +7,7 @@ from .models import (
     Conversation,
     DoctorProfile,
     Message,
+    MessageAttachment,
     MedicalDocument,
     MedicalRecord,
     Notification,
@@ -337,12 +338,14 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
     def validate(self, data):
         from .services import AppointmentValidationService
         import logging
-        logger = logging.getLogger(__name__)
 
+        logger = logging.getLogger(__name__)
         doctor = data["doctor"]
         date = data["date"]
 
-        logger.warning(f"[DEBUG] CreateAppointment validate: doctor={doctor}, date={date}, type={type(date)}, is_naive={timezone.is_naive(date) if hasattr(date, 'tzinfo') else 'N/A'}")
+        logger.warning(
+            f"[DEBUG] CreateAppointment validate: doctor={doctor}, date={date}, type={type(date)}, is_naive={timezone.is_naive(date) if hasattr(date, 'tzinfo') else 'N/A'}"
+        )
 
         is_valid_time, message = AppointmentValidationService.validate_appointment_retention(date)
         if not is_valid_time:
@@ -371,7 +374,9 @@ class CreateAppointmentSerializer(serializers.ModelSerializer):
             for slot in available_slots
         )
         if not slot_exists:
-            logger.warning(f"[DEBUG] SLOT NOT FOUND! requested={requested_slot} not in {[s.replace(second=0, microsecond=0) for s in available_slots]}")
+            logger.warning(
+                f"[DEBUG] SLOT NOT FOUND! requested={requested_slot} not in {[s.replace(second=0, microsecond=0) for s in available_slots]}"
+            )
             raise serializers.ValidationError(
                 "Ce créneau n'est plus disponible. Veuillez actualiser les horaires."
             )
@@ -388,10 +393,35 @@ class NotificationSerializer(serializers.ModelSerializer):
         fields = ["id", "title", "message", "date", "type"]
 
 
+class MessageAttachmentSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = MessageAttachment
+        fields = [
+            "id",
+            "file",
+            "file_url",
+            "file_name",
+            "file_type",
+            "file_size",
+            "uploaded_at",
+        ]
+        read_only_fields = fields
+
+    def get_file_url(self, obj):
+        request = self.context.get("request")
+        if request:
+            return request.build_absolute_uri(obj.file.url)
+        return obj.file.url
+
+
 class MessageSerializer(serializers.ModelSerializer):
     sender_name = serializers.CharField(source="sender.get_full_name", read_only=True)
     sender_role = serializers.CharField(source="sender.role", read_only=True)
     is_mine = serializers.SerializerMethodField()
+    attachments = MessageAttachmentSerializer(many=True, read_only=True)
+    has_attachments = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
@@ -405,6 +435,8 @@ class MessageSerializer(serializers.ModelSerializer):
             "is_read",
             "created_at",
             "is_mine",
+            "attachments",
+            "has_attachments",
         ]
         read_only_fields = [
             "id",
@@ -412,24 +444,39 @@ class MessageSerializer(serializers.ModelSerializer):
             "sender",
             "sender_name",
             "sender_role",
+            "content",
             "is_read",
             "created_at",
             "is_mine",
+            "attachments",
+            "has_attachments",
         ]
 
     def get_is_mine(self, obj):
         request = self.context.get("request")
         return bool(request and request.user == obj.sender)
 
+    def get_has_attachments(self, obj):
+        return obj.attachments.exists()
+
 
 class SendMessageSerializer(serializers.Serializer):
-    content = serializers.CharField(allow_blank=False, trim_whitespace=True)
+    content = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        trim_whitespace=True,
+    )
 
     def validate_content(self, value):
-        value = value.strip()
-        if not value:
+        return value.strip()
+
+    def validate(self, attrs):
+        content = attrs.get("content", "").strip()
+        has_file = bool(self.context.get("has_file"))
+        if not content and not has_file:
             raise serializers.ValidationError("Le message ne peut pas être vide.")
-        return value
+        attrs["content"] = content
+        return attrs
 
 
 class StartConversationSerializer(serializers.Serializer):

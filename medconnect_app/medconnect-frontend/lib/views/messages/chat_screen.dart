@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -7,16 +8,17 @@ import '../../models/conversation.dart';
 import '../../view_models/doctor_auth_view_model.dart';
 import '../../view_models/messages_view_model.dart';
 import '../../view_models/patient_auth_view_model.dart';
+import '../common/document_viewer_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final String role;
   final Conversation conversation;
 
   const ChatScreen({
-    Key? key,
     required this.role,
     required this.conversation,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -25,6 +27,9 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
+  PlatformFile? _selectedAttachment;
+  bool _isSending = false;
 
   @override
   void initState() {
@@ -75,19 +80,43 @@ class _ChatScreenState extends State<ChatScreen> {
     });
   }
 
+  Future<void> _pickAttachment() async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty || !mounted) return;
+    setState(() {
+      _selectedAttachment = result.files.single;
+    });
+  }
+
   Future<void> _sendMessage() async {
     final content = _controller.text.trim();
     final token = _resolveToken();
-    if (content.isEmpty || token == null) return;
+    if ((content.isEmpty && _selectedAttachment == null) || token == null) {
+      return;
+    }
 
     final viewModel = Provider.of<MessagesViewModel>(context, listen: false);
+    setState(() => _isSending = true);
     final success = await viewModel.sendMessage(
       token,
       widget.conversation.id,
       content,
+      fileBytes: _selectedAttachment?.bytes,
+      fileName: _selectedAttachment?.name,
     );
 
     if (!mounted) return;
+    setState(() {
+      _isSending = false;
+      if (success) {
+        _selectedAttachment = null;
+      }
+    });
+
     if (success) {
       _controller.clear();
       _scrollToBottom();
@@ -96,6 +125,19 @@ class _ChatScreenState extends State<ChatScreen> {
         SnackBar(content: Text(viewModel.error ?? 'Envoi impossible')),
       );
     }
+  }
+
+  void _openAttachment(ChatAttachment attachment) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DocumentViewerScreen(
+          url: attachment.fileUrl,
+          title: attachment.fileName,
+          documentType: attachment.fileType,
+        ),
+      ),
+    );
   }
 
   @override
@@ -137,38 +179,134 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ],
               ),
-              child: Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: 'Écrire un message...',
-                        filled: true,
-                        fillColor: const Color(0xFFF5F9FC),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(14),
-                          borderSide: BorderSide.none,
-                        ),
+                  if (_selectedAttachment != null)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE9F1F5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.attach_file,
+                            color: Color(0xFF567991),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _selectedAttachment!.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              setState(() => _selectedAttachment = null);
+                            },
+                            icon: const Icon(Icons.close),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  CircleAvatar(
-                    radius: 24,
-                    backgroundColor: const Color(0xFF567991),
-                    child: IconButton(
-                      onPressed: _sendMessage,
-                      icon: const Icon(Icons.send, color: Colors.white),
-                    ),
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundColor: const Color(0xFFE9F1F5),
+                        child: IconButton(
+                          onPressed: _isSending ? null : _pickAttachment,
+                          icon: const Icon(
+                            Icons.attach_file,
+                            color: Color(0xFF567991),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: _controller,
+                          minLines: 1,
+                          maxLines: 4,
+                          decoration: InputDecoration(
+                            hintText: 'Écrire un message...',
+                            filled: true,
+                            fillColor: const Color(0xFFF5F9FC),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      CircleAvatar(
+                        radius: 24,
+                        backgroundColor: const Color(0xFF567991),
+                        child: IconButton(
+                          onPressed: _isSending ? null : _sendMessage,
+                          icon: _isSending
+                              ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              : const Icon(Icons.send, color: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildAttachmentTile(ChatAttachment attachment, bool isMine) {
+    return InkWell(
+      onTap: attachment.fileUrl.isEmpty ? null : () => _openAttachment(attachment),
+      child: Container(
+        margin: const EdgeInsets.only(top: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: isMine ? const Color(0x338BC6EC) : const Color(0xFFF2F5F8),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              attachment.isImage
+                  ? Icons.image_outlined
+                  : Icons.picture_as_pdf_outlined,
+              color: isMine ? Colors.white : const Color(0xFF567991),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                attachment.fileName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color: isMine ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -205,12 +343,15 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
               ),
-            Text(
-              message.content,
-              style: TextStyle(
-                color: message.isMine ? Colors.white : Colors.black87,
+            if (message.content.isNotEmpty)
+              Text(
+                message.content,
+                style: TextStyle(
+                  color: message.isMine ? Colors.white : Colors.black87,
+                ),
               ),
-            ),
+            for (final attachment in message.attachments)
+              _buildAttachmentTile(attachment, message.isMine),
             const SizedBox(height: 4),
             Text(
               dateText,

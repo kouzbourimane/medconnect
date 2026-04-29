@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 import '../models/chat_message.dart';
 import '../models/conversation.dart';
@@ -89,13 +90,19 @@ class MessagesViewModel with ChangeNotifier {
   Future<bool> sendMessage(
     String token,
     int conversationId,
-    String content,
-  ) async {
+    String content, {
+    File? file,
+    Uint8List? fileBytes,
+    String? fileName,
+  }) async {
     try {
       final message = await _messageService.sendMessage(
         token,
         conversationId,
         content,
+        file: file,
+        fileBytes: fileBytes,
+        fileName: fileName,
       );
       _messages = [..._messages, message];
       await loadConversations(token);

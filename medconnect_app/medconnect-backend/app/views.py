@@ -12,6 +12,7 @@ from .models import (
     Appointment,
     Conversation,
     DoctorProfile,
+    MessageAttachment,
     MedicalDocument,
     MedicalRecord,
     Message,
@@ -431,6 +432,8 @@ class ConversationViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = ConversationSerializer
     allowed_appointment_statuses = ["PENDING", "CONFIRMED", "COMPLETED"]
+    allowed_attachment_extensions = {"pdf", "jpg", "jpeg", "png"}
+    max_attachment_size = 10 * 1024 * 1024
 
     def get_queryset(self):
         user = self.request.user
@@ -477,6 +480,33 @@ class ConversationViewSet(viewsets.ReadOnlyModelViewSet):
             title=f"Nouveau message de {sender_name}",
             message=preview,
             type="MESSAGE",
+        )
+
+    def _validate_message_attachment(self, file_obj):
+        if not file_obj:
+            return
+
+        if file_obj.size > self.max_attachment_size:
+            raise serializers.ValidationError(
+                {"file": "Fichier trop volumineux (max 10MB)."}
+            )
+
+        extension = file_obj.name.rsplit(".", 1)[-1].lower() if "." in file_obj.name else ""
+        if extension not in self.allowed_attachment_extensions:
+            raise serializers.ValidationError(
+                {"file": "Type de fichier non supporté (PDF, JPG, JPEG, PNG uniquement)."}
+            )
+
+    def _create_attachment(self, message, file_obj):
+        if not file_obj:
+            return None
+
+        return MessageAttachment.objects.create(
+            message=message,
+            file=file_obj,
+            file_name=file_obj.name,
+            file_type=getattr(file_obj, "content_type", "") or "",
+            file_size=getattr(file_obj, "size", 0) or 0,
         )
 
     @action(detail=False, methods=["get"])
@@ -593,7 +623,13 @@ class ConversationViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=["post"])
     def send(self, request, pk=None):
         conversation = self.get_object()
-        serializer = SendMessageSerializer(data=request.data)
+        file_obj = request.FILES.get("file")
+        self._validate_message_attachment(file_obj)
+
+        serializer = SendMessageSerializer(
+            data=request.data,
+            context={"has_file": bool(file_obj)},
+        )
         serializer.is_valid(raise_exception=True)
 
         sender = request.user
@@ -603,14 +639,18 @@ class ConversationViewSet(viewsets.ReadOnlyModelViewSet):
         message = Message.objects.create(
             conversation=conversation,
             sender=sender,
-            content=serializer.validated_data["content"],
+            content=serializer.validated_data.get("content") or file_obj.name,
         )
+        self._create_attachment(message, file_obj)
 
         recipient = self._get_destination_user(conversation, sender)
         sender_name = sender.get_full_name() or sender.username
         self._create_message_notification(recipient, sender_name, message.content)
 
-        output = MessageSerializer(message, context={"request": request})
+        output = MessageSerializer(
+            message,
+            context={"request": request},
+        )
         return Response(output.data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=["post"])

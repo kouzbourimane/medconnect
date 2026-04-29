@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
 
@@ -136,13 +138,48 @@ class MessageService {
   Future<ChatMessage> sendMessage(
     String token,
     int conversationId,
-    String content,
-  ) async {
-    final response = await http.post(
-      Uri.parse('${ApiService.apiPrefix}/conversations/$conversationId/send/'),
-      headers: _headers(token),
-      body: json.encode({'content': content}),
+    String content, {
+    File? file,
+    Uint8List? fileBytes,
+    String? fileName,
+  }) async {
+    final uri = Uri.parse(
+      '${ApiService.apiPrefix}/conversations/$conversationId/send/',
     );
+    http.Response response;
+
+    if (file != null || fileBytes != null) {
+      final request = http.MultipartRequest('POST', uri);
+      request.headers['Authorization'] = 'Token $token';
+      request.headers['Accept'] = 'application/json';
+      request.fields['content'] = content;
+
+      if (fileBytes != null) {
+        request.files.add(
+          http.MultipartFile.fromBytes(
+            'file',
+            fileBytes,
+            filename: fileName ?? 'piece-jointe.pdf',
+          ),
+        );
+      } else if (file != null) {
+        request.files.add(
+          await http.MultipartFile.fromPath(
+            'file',
+            file.path,
+            filename: fileName,
+          ),
+        );
+      }
+
+      response = await http.Response.fromStream(await request.send());
+    } else {
+      response = await http.post(
+        uri,
+        headers: _headers(token),
+        body: json.encode({'content': content}),
+      );
+    }
 
     if (response.statusCode != 201) {
       throw Exception(_parseError(response));

@@ -188,6 +188,25 @@ class Message(models.Model):
         )
 
 
+class MessageAttachment(models.Model):
+    message = models.ForeignKey(
+        Message,
+        on_delete=models.CASCADE,
+        related_name="attachments",
+    )
+    file = models.FileField(upload_to="message_attachments/")
+    file_name = models.CharField(max_length=255)
+    file_type = models.CharField(max_length=100, blank=True)
+    file_size = models.PositiveIntegerField(default=0)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["uploaded_at"]
+
+    def __str__(self):
+        return f"Attachment #{self.id} for message #{self.message_id}"
+
+
 class AvailabilitySlot(models.Model):
     DAYS_OF_WEEK = [
         (0, 'Lundi'), (1, 'Mardi'), (2, 'Mercredi'),
