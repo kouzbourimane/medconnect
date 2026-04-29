@@ -7,6 +7,8 @@ pipeline {
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         FIREBASE_TOKEN = credentials('firebase-token')
         FIREBASE_APP_ID = '1:621469238732:android:ead2ba093a5c9907f80969'
+        ANDROID_HOME = '/opt/android-sdk'
+        PATH = "${env.PATH}:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools"
     }
 
     stages {
