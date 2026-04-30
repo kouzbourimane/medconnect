@@ -5,6 +5,7 @@ import '../../view_models/patient_auth_view_model.dart';
 import '../auth/combined_login_screen.dart';
 import 'appointments/appointment_list_screen.dart';
 import 'appointments/book_appointment_screen.dart';
+import '../messages/conversations_screen.dart';
 import 'profile/patient_profile_screen.dart';
 import 'documents/documents_screen.dart';
 import 'medical_record/medical_record_screen.dart';
@@ -174,6 +175,13 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const DocumentsScreen()),
+            );
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ConversationsScreen(role: 'PATIENT'),
+              ),
             );
           } else if (index == 4) {
             Navigator.push(
@@ -349,6 +357,12 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             "$msgCount non lus",
             Icons.message,
             const Color(0xFF86B7D7),
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const ConversationsScreen(role: 'PATIENT'),
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           _buildSummaryCard(
@@ -450,6 +464,12 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
           "Contacter Médecin",
           Icons.chat,
           Colors.purple,
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const ConversationsScreen(role: 'PATIENT'),
+            ),
+          ),
         ),
         _buildActionCard(
           context,

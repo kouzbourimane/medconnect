@@ -4,6 +4,7 @@ import '../../view_models/doctor_dashboard_view_model.dart';
 import '../../view_models/doctor_auth_view_model.dart';
 import '../auth/combined_login_screen.dart';
 import 'appointments/doctor_appointments_screen.dart';
+import '../messages/conversations_screen.dart';
 import 'profile/doctor_profile_screen.dart';
 import 'patients/doctor_patients_screen.dart';
 
@@ -42,7 +43,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
   final List<Widget> _screens = [
     const SizedBox.shrink(), // Dashboard home is handled separately in build method
     const DoctorAppointmentsScreen(),
-    const Center(child: Text('Messages')),
+    const ConversationsScreen(role: 'DOCTOR'),
     const DoctorPatientsScreen(),
     const DoctorProfileScreen(),
   ];
