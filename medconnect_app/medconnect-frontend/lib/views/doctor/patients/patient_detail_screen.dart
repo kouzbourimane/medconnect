@@ -162,7 +162,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> with SingleTi
                   border: Border.all(color: _getStatusColor(appt.status)),
                 ),
                 child: Text(
-                  appt.status, 
+                  appt.statusLabel,
                   style: TextStyle(color: _getStatusColor(appt.status), fontSize: 12),
                 ),
               ),

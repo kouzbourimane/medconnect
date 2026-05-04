@@ -19,8 +19,8 @@ class AppointmentViewModel with ChangeNotifier {
     return _appointments
         .where(
           (a) =>
-              a.status != 'CANCELLED' &&
-              a.status != 'REJECTED' &&
+              a.status != Appointment.statusCancelled &&
+              a.status != Appointment.statusRefused &&
               a.dateTime.isAfter(now),
         )
         .toList();
@@ -31,15 +31,21 @@ class AppointmentViewModel with ChangeNotifier {
     return _appointments
         .where(
           (a) =>
-              a.status == 'COMPLETED' ||
-              (a.status != 'CANCELLED' && a.dateTime.isBefore(now)),
+              a.status == Appointment.statusCompleted ||
+              ((a.status == Appointment.statusPending ||
+                      a.status == Appointment.statusConfirmed) &&
+                  a.dateTime.isBefore(now)),
         )
         .toList();
   }
 
   List<Appointment> get cancelledAppointments {
     return _appointments
-        .where((a) => a.status == 'CANCELLED' || a.status == 'REJECTED')
+        .where(
+          (a) =>
+              a.status == Appointment.statusCancelled ||
+              a.status == Appointment.statusRefused,
+        )
         .toList();
   }
 
@@ -76,6 +82,31 @@ class AppointmentViewModel with ChangeNotifier {
         reason,
       );
       await fetchAppointments(token); // Refresh list
+      return true;
+    } catch (e) {
+      _error = e.toString().replaceAll('Exception: ', '');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> cancelAppointment(String token, int id, {String? reason}) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      final updated = await _appointmentService.cancelAppointment(
+        token,
+        id,
+        reason: reason,
+      );
+      final index = _appointments.indexWhere((a) => a.id == id);
+      if (index != -1) {
+        _appointments[index] = updated;
+      }
       return true;
     } catch (e) {
       _error = e.toString().replaceAll('Exception: ', '');

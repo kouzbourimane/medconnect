@@ -101,8 +101,10 @@ class Appointment(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     reason = models.TextField(blank=True, null=True)
     refusal_reason = models.TextField(blank=True, null=True, help_text="Raison du refus (optionnel)")
+    cancel_reason = models.TextField(blank=True, null=True, help_text="Raison de l'annulation (optionnel)")
     notes_patient = models.TextField(blank=True, null=True, help_text="Notes visibles par le patient")
     notes_doctor = models.TextField(blank=True, null=True, help_text="Notes privées du médecin")
+    reminder_sent = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

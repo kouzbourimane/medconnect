@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:medconnect_app/views/patient/appointments/appointment_detail_screen.dart';
 import 'package:medconnect_app/views/patient/appointments/book_appointment_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../view_models/patient/appointment_view_model.dart';
@@ -58,9 +59,9 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white.withOpacity(0.5),
           tabs: const [
-            Tab(text: 'À venir'),
-            Tab(text: 'Passés'),
-            Tab(text: 'Annulés'),
+            Tab(text: 'A venir'),
+            Tab(text: 'Passes'),
+            Tab(text: 'Annules'),
           ],
         ),
       ),
@@ -100,7 +101,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
 
   Widget _buildList(List<Appointment> appointments) {
     if (appointments.isEmpty) {
-      return const Center(child: Text("Aucun rendez-vous trouvé"));
+      return const Center(child: Text("Aucun rendez-vous trouve"));
     }
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -143,6 +144,14 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
               ],
             ),
             trailing: _buildStatusBadge(appt.status),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => AppointmentDetailScreen(appointment: appt),
+                ),
+              );
+            },
           ),
         );
       },
@@ -153,21 +162,25 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
     Color color;
     String text;
     switch (status) {
-      case 'PENDING':
+      case Appointment.statusPending:
         color = Colors.orange;
         text = 'En attente';
         break;
-      case 'CONFIRMED':
+      case Appointment.statusConfirmed:
         color = Colors.green;
-        text = 'Confirmé';
+        text = 'Confirme';
         break;
-      case 'CANCELLED':
+      case Appointment.statusCancelled:
         color = Colors.red;
-        text = 'Annulé';
+        text = 'Annule';
         break;
-      case 'COMPLETED':
+      case Appointment.statusRefused:
+        color = Colors.redAccent;
+        text = 'Refuse';
+        break;
+      case Appointment.statusCompleted:
         color = Colors.blue;
-        text = 'Terminé';
+        text = 'Termine';
         break;
       default:
         color = Colors.grey;

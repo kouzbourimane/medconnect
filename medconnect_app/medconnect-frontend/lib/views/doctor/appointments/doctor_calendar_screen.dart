@@ -176,7 +176,7 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
         return ListTile(
           leading: Icon(Icons.access_time, color: Theme.of(context).primaryColor),
           title: Text(appt.patientName),
-          subtitle: Text('${appt.date.split('T')[1].substring(0, 5)} (${appt.duration} min) - ${appt.status}'),
+          subtitle: Text('${appt.date.split('T')[1].substring(0, 5)} (${appt.duration} min) - ${appt.statusLabel}'),
         );
       },
     );

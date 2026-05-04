@@ -445,7 +445,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
 
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Rendez-vous confirmé !")),
+          const SnackBar(content: Text("Demande de rendez-vous envoyée.")),
         );
         Navigator.pop(context);
       } else if (mounted) {

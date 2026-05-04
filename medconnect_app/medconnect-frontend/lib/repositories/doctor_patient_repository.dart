@@ -31,8 +31,7 @@ class DoctorPatientRepository {
   }
 
   Future<List<Appointment>> getPatientHistory(String token, int patientId) async {
-    // Fetch all doctor appointments
-    final url = Uri.parse('${ApiService.apiPrefix}/appointments/');
+    final url = Uri.parse('${ApiService.apiPrefix}/appointments/?patient=$patientId');
     try {
       final response = await http.get(
         url,
@@ -44,10 +43,7 @@ class DoctorPatientRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> body = json.decode(response.body);
-        final allAppointments = body.map((e) => Appointment.fromJson(e)).toList();
-        
-        // Filter locally by patientId
-        return allAppointments.where((appt) => appt.patientId == patientId).toList();
+        return body.map((e) => Appointment.fromJson(e)).toList();
       } else {
         print("Erreur API appointments: ${response.statusCode}");
         return [];

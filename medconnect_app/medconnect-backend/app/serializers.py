@@ -266,6 +266,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             "status",
             "reason",
             "refusal_reason",
+            "cancel_reason",
             "notes_patient",
             "created_at",
         ]
@@ -277,6 +278,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
             "created_at",
             "notes_patient",
             "refusal_reason",
+            "cancel_reason",
         ]
 
 

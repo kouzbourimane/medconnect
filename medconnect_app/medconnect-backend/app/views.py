@@ -631,11 +631,19 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        patient_id = self.request.query_params.get('patient')
+
         if user.is_patient():
-            return Appointment.objects.filter(patient__user=user)
+            queryset = Appointment.objects.filter(patient__user=user)
         elif user.is_doctor():
-            return Appointment.objects.filter(doctor__user=user)
-        return Appointment.objects.none()
+            queryset = Appointment.objects.filter(doctor__user=user)
+        else:
+            queryset = Appointment.objects.none()
+
+        if patient_id and user.is_doctor():
+            queryset = queryset.filter(patient_id=patient_id)
+
+        return queryset
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -655,6 +663,21 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         read_serializer = AppointmentSerializer(serializer.instance)
         headers = self.get_success_headers(read_serializer.data)
         return Response(read_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        raise serializers.ValidationError(
+            "La modification directe d'un rendez-vous n'est pas autorisée. Utilisez les actions métier dédiées."
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        raise serializers.ValidationError(
+            "La modification directe d'un rendez-vous n'est pas autorisée. Utilisez les actions métier dédiées."
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        raise serializers.ValidationError(
+            "La suppression directe d'un rendez-vous n'est pas autorisée. Utilisez l'action d'annulation."
+        )
 
 class MedicalDocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -858,6 +881,16 @@ class PatchedAppointmentViewSet(AppointmentViewSet):
             type='APPOINTMENT',
         )
 
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        appointment = serializer.instance
+        patient_name = appointment.patient.user.get_full_name() or appointment.patient.user.username
+        self._create_notification(
+            appointment.doctor.user,
+            "Nouvelle demande de rendez-vous",
+            f"{patient_name} a demandé un rendez-vous le {appointment.date:%Y-%m-%d à %H:%M}.",
+        )
+
     def _ensure_doctor_owner(self, request, appointment):
         if not request.user.is_doctor() or appointment.doctor.user != request.user:
             raise serializers.ValidationError("Action réservée au médecin concerné par ce rendez-vous.")
@@ -925,8 +958,11 @@ class PatchedAppointmentViewSet(AppointmentViewSet):
             raise serializers.ValidationError("Ce rendez-vous ne peut plus être annulé.")
 
         appointment.status = 'CANCELLED'
-        appointment.save(update_fields=['status', 'updated_at'])
+        appointment.cancel_reason = request.data.get('reason') or None
+        appointment.save(update_fields=['status', 'cancel_reason', 'updated_at'])
 
+        if appointment.cancel_reason:
+            actor_label = f"{actor_label} (motif : {appointment.cancel_reason})"
         self._create_notification(
             target_user,
             "Rendez-vous annulé",

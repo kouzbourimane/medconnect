@@ -1,13 +1,13 @@
-﻿class Appointment {
-  static const String statusPending = 'En attente';
-  static const String statusConfirmed = 'Confirmé';
-  static const String statusCancelled = 'Annulé';
-  static const String statusRefused = 'Refusé';
-  static const String statusCompleted = 'Terminé';
+class Appointment {
+  static const String statusPending = 'PENDING';
+  static const String statusConfirmed = 'CONFIRMED';
+  static const String statusCancelled = 'CANCELLED';
+  static const String statusRefused = 'REFUSED';
+  static const String statusCompleted = 'COMPLETED';
 
   final int id;
   final int doctorId;
-  final int patientId; // Added for matching history
+  final int patientId;
   final String doctorName;
   final String patientName;
   final String specialty;
@@ -15,10 +15,28 @@
   final int duration;
   final String status;
   final String? reason;
+  final String? refusalReason;
+  final String? cancelReason;
   final String? notesPatient;
 
-  // Computed properties
   DateTime get dateTime => DateTime.parse(date);
+
+  String get statusLabel {
+    switch (status) {
+      case statusPending:
+        return 'En attente';
+      case statusConfirmed:
+        return 'Confirme';
+      case statusCancelled:
+        return 'Annule';
+      case statusRefused:
+        return 'Refuse';
+      case statusCompleted:
+        return 'Termine';
+      default:
+        return status;
+    }
+  }
 
   Appointment({
     required this.id,
@@ -31,47 +49,35 @@
     required this.duration,
     required this.status,
     this.reason,
+    this.refusalReason,
+    this.cancelReason,
     this.notesPatient,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
-    String apiStatus = json['status'] ?? 'PENDING';
-    String displayStatus = statusPending;
-    
-    switch (apiStatus) {
-      case 'PENDING':
-        displayStatus = statusPending;
-        break;
-      case 'CONFIRMED':
-        displayStatus = statusConfirmed;
-        break;
-      case 'CANCELLED':
-        displayStatus = statusCancelled;
-        break;
-      case 'COMPLETED':
-        displayStatus = statusCompleted;
-        break;
-      default:
-        displayStatus = apiStatus; // Fallback for 'En attente' etc if already translated
-    }
-
     return Appointment(
       id: json['id'],
       doctorId: json['doctor'] ?? 0,
       patientId: json['patient'] ?? 0,
       doctorName: json['doctor_name'] ?? 'Inconnu',
       patientName: json['patient_name'] ?? 'Inconnu',
-      specialty: json['specialty'] ?? 'Général',
+      specialty: json['specialty'] ?? 'General',
       date: json['date'],
       duration: json['duration'] ?? 30,
-      status: displayStatus,
+      status: json['status'] ?? statusPending,
       reason: json['reason'],
+      refusalReason: json['refusal_reason'],
+      cancelReason: json['cancel_reason'],
       notesPatient: json['notes_patient'],
     );
   }
 
   Appointment copyWith({
     String? status,
+    String? date,
+    String? refusalReason,
+    String? cancelReason,
+    String? notesPatient,
   }) {
     return Appointment(
       id: id,
@@ -80,11 +86,13 @@
       doctorName: doctorName,
       patientName: patientName,
       specialty: specialty,
-      date: date,
+      date: date ?? this.date,
       duration: duration,
       status: status ?? this.status,
       reason: reason,
-      notesPatient: notesPatient,
+      refusalReason: refusalReason ?? this.refusalReason,
+      cancelReason: cancelReason ?? this.cancelReason,
+      notesPatient: notesPatient ?? this.notesPatient,
     );
   }
 }
