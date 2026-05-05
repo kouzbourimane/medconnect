@@ -52,7 +52,7 @@ class DoctorAppointmentViewModel with ChangeNotifier {
 
   Future<void> acceptAppointment(String token, int id) async {
     try {
-      final updated = await _appointmentRepository.updateAppointmentStatus(token, id, Appointment.statusConfirmed);
+      final updated = await _appointmentRepository.acceptAppointment(token, id);
       _updateLocalAppointment(updated);
     } catch (e) {
        // Handle error (maybe show snackbar in UI)
@@ -60,27 +60,35 @@ class DoctorAppointmentViewModel with ChangeNotifier {
     }
   }
 
-  Future<void> refuseAppointment(String token, int id) async {
+  Future<void> refuseAppointment(String token, int id, {String? reason}) async {
     try {
-      final updated = await _appointmentRepository.updateAppointmentStatus(token, id, Appointment.statusRefused);
+      final updated = await _appointmentRepository.refuseAppointment(
+        token,
+        id,
+        reason: reason,
+      );
        _updateLocalAppointment(updated);
     } catch (e) {
        rethrow;
     }
   }
 
-  Future<void> cancelAppointment(String token, int id) async {
+  Future<void> cancelAppointment(String token, int id, {String? reason}) async {
     try {
-      final updated = await _appointmentRepository.updateAppointmentStatus(token, id, Appointment.statusCancelled);
+      final updated = await _appointmentRepository.cancelAppointment(
+        token,
+        id,
+        reason: reason,
+      );
        _updateLocalAppointment(updated);
     } catch (e) {
        rethrow;
     }
   }
 
-  Future<void> rescheduleAppointment(String token, int id, DateTime newDate) async {
+  Future<void> completeAppointment(String token, int id) async {
     try {
-      final updated = await _appointmentRepository.rescheduleAppointment(token, id, newDate);
+      final updated = await _appointmentRepository.completeAppointment(token, id);
       _updateLocalAppointment(updated);
     } catch (e) {
       rethrow;

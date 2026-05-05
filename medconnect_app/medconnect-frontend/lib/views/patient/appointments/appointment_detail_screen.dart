@@ -1,5 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../models/appointment.dart';
+import '../../../view_models/patient/appointment_view_model.dart';
+import '../../../view_models/patient_auth_view_model.dart';
 
 class AppointmentDetailScreen extends StatelessWidget {
   final Appointment appointment;
@@ -12,7 +15,7 @@ class AppointmentDetailScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F9FC),
       appBar: AppBar(
-        title: const Text('Détails du Rendez-vous'),
+        title: const Text('Details du Rendez-vous'),
         backgroundColor: const Color(0xFF567991),
       ),
       body: SingleChildScrollView(
@@ -22,7 +25,7 @@ class AppointmentDetailScreen extends StatelessWidget {
           children: [
             _buildHeader(context),
             const SizedBox(height: 20),
-            _buildSection("Médecin", [
+            _buildSection("Medecin", [
               Text(
                 appointment.doctorName,
                 style: const TextStyle(
@@ -48,21 +51,33 @@ class AppointmentDetailScreen extends StatelessWidget {
             ]),
             const SizedBox(height: 16),
             _buildSection("Raison", [
-              Text(appointment.reason ?? "Non spécifié"),
+              Text(appointment.reason ?? "Non specifie"),
             ]),
             if (appointment.notesPatient != null) ...[
               const SizedBox(height: 16),
-              _buildSection("Notes du médecin", [
+              _buildSection("Notes du medecin", [
                 Text(appointment.notesPatient!),
               ]),
             ],
+            if (appointment.refusalReason != null &&
+                appointment.refusalReason!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              _buildSection("Motif du refus", [
+                Text(appointment.refusalReason!),
+              ]),
+            ],
+            if (appointment.cancelReason != null &&
+                appointment.cancelReason!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              _buildSection("Motif d'annulation", [
+                Text(appointment.cancelReason!),
+              ]),
+            ],
             const SizedBox(height: 30),
-            if (appointment.status == 'PENDING' ||
-                appointment.status == 'CONFIRMED')
+            if (appointment.status == Appointment.statusPending ||
+                appointment.status == Appointment.statusConfirmed)
               ElevatedButton(
-                onPressed: () {
-                  // TODO: Implement cancel
-                },
+                onPressed: () => _cancelAppointment(context),
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: const Text('Annuler le Rendez-vous'),
               ),
@@ -87,7 +102,7 @@ class AppointmentDetailScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            _getStatusText(appointment.status),
+            appointment.statusLabel,
             style: TextStyle(
               color: _getStatusColor(appointment.status),
               fontWeight: FontWeight.bold,
@@ -123,37 +138,84 @@ class AppointmentDetailScreen extends StatelessWidget {
     );
   }
 
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'PENDING':
-        return 'En attente';
-      case 'CONFIRMED':
-        return 'Confirmé';
-      case 'CANCELLED':
-        return 'Annulé';
-      case 'COMPLETED':
-        return 'Terminé';
-      case 'REJECTED':
-        return 'Rejeté';
-      default:
-        return status;
-    }
-  }
-
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'PENDING':
+      case Appointment.statusPending:
         return Colors.orange;
-      case 'CONFIRMED':
+      case Appointment.statusConfirmed:
         return Colors.green;
-      case 'CANCELLED':
+      case Appointment.statusCancelled:
         return Colors.red;
-      case 'REJECTED':
+      case Appointment.statusRefused:
         return Colors.red;
-      case 'COMPLETED':
+      case Appointment.statusCompleted:
         return Colors.blue;
       default:
         return Colors.grey;
     }
+  }
+
+  Future<void> _cancelAppointment(BuildContext context) async {
+    final authViewModel = Provider.of<PatientAuthViewModel>(context, listen: false);
+    final appointmentViewModel = Provider.of<AppointmentViewModel>(context, listen: false);
+    final token = authViewModel.authResponse?.token;
+
+    if (token == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Session expiree, veuillez vous reconnecter.')),
+      );
+      return;
+    }
+
+    final reason = await _askReason(context, "Motif d'annulation");
+    if (reason == null) return;
+
+    final success = await appointmentViewModel.cancelAppointment(
+      token,
+      appointment.id,
+      reason: reason,
+    );
+    if (!context.mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Rendez-vous annule avec succes.')),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(appointmentViewModel.error ?? 'Erreur d\'annulation')),
+      );
+    }
+  }
+
+  Future<String?> _askReason(BuildContext context, String title) async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Motif',
+              border: OutlineInputBorder(),
+            ),
+            maxLines: 3,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Retour'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+              child: const Text('Confirmer'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

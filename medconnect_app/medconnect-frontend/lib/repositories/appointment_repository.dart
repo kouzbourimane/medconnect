@@ -11,16 +11,19 @@ class AppointmentRepository {
     return _appointmentService.getAppointments(token);
   }
 
-  Future<Appointment> updateAppointmentStatus(String token, int id, String status) {
-    return _appointmentService.updateStatus(token, id, status);
+  Future<Appointment> acceptAppointment(String token, int id) {
+    return _appointmentService.acceptAppointment(token, id);
   }
 
-  Future<void> cancelAppointment(String token, int id) {
-    // Assuming cancel just updates status to cancelled
-    return _appointmentService.updateStatus(token, id, Appointment.statusCancelled);
+  Future<Appointment> refuseAppointment(String token, int id, {String? reason}) {
+    return _appointmentService.refuseAppointment(token, id, reason: reason);
   }
 
-  Future<Appointment> rescheduleAppointment(String token, int id, DateTime newDate) {
-    return _appointmentService.reschedule(token, id, newDate);
+  Future<Appointment> cancelAppointment(String token, int id, {String? reason}) {
+    return _appointmentService.cancelAppointment(token, id, reason: reason);
+  }
+
+  Future<Appointment> completeAppointment(String token, int id) {
+    return _appointmentService.completeAppointment(token, id);
   }
 }

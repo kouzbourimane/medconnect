@@ -1,17 +1,38 @@
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status, generics, serializers
 from rest_framework.decorators import action, permission_classes, api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
+from django.utils import timezone
 from datetime import datetime, time
 
-from .models import User, PatientProfile, DoctorProfile, MedicalDocument
+from .models import (
+    Appointment,
+    Conversation,
+    DoctorProfile,
+    MedicalDocument,
+    MedicalRecord,
+    Message,
+    PatientProfile,
+    User,
+)
 from .serializers import (
-    UserSerializer, PatientProfileSerializer, DoctorProfileSerializer,
-    RegisterPatientSerializer, LoginSerializer, PatientDashboardSerializer,
-    MedicalDocumentSerializer, RegisterDoctorSerializer
+    AppointmentSerializer,
+    ConversationSerializer,
+    CreateAppointmentSerializer,
+    DoctorProfileSerializer,
+    LoginSerializer,
+    MedicalDocumentSerializer,
+    MessageSerializer,
+    PatientDashboardSerializer,
+    PatientProfileSerializer,
+    RegisterDoctorSerializer,
+    RegisterPatientSerializer,
+    SendMessageSerializer,
+    StartConversationSerializer,
+    UserSerializer,
 )
 from .permissions import IsAgentOrSuperAdmin
 
@@ -405,8 +426,200 @@ class DoctorViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from .serializers import AppointmentSerializer, CreateAppointmentSerializer
-from .models import Appointment
+
+class ConversationViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ConversationSerializer
+    allowed_appointment_statuses = ["PENDING", "CONFIRMED", "COMPLETED"]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Conversation.objects.select_related(
+            "patient",
+            "patient__user",
+            "doctor",
+            "doctor__user",
+        )
+
+        if user.is_patient():
+            return queryset.filter(patient__user=user)
+        if user.is_doctor():
+            return queryset.filter(doctor__user=user)
+        return queryset.none()
+
+    def _linked_appointments_queryset(self, patient=None, doctor=None):
+        filters = {
+            "status__in": self.allowed_appointment_statuses,
+        }
+        if patient is not None:
+            filters["patient"] = patient
+        if doctor is not None:
+            filters["doctor"] = doctor
+        return Appointment.objects.filter(**filters)
+
+    def _ensure_link(self, patient, doctor):
+        return self._linked_appointments_queryset(
+            patient=patient,
+            doctor=doctor,
+        ).exists()
+
+    def _get_destination_user(self, conversation, sender):
+        if sender == conversation.patient.user:
+            return conversation.doctor.user
+        return conversation.patient.user
+
+    def _create_message_notification(self, user, sender_name, content):
+        from .models import Notification
+
+        preview = content if len(content) <= 80 else f"{content[:77]}..."
+        Notification.objects.create(
+            user=user,
+            title=f"Nouveau message de {sender_name}",
+            message=preview,
+            type="MESSAGE",
+        )
+
+    @action(detail=False, methods=["get"])
+    def contacts(self, request):
+        user = request.user
+        contacts = []
+
+        if user.is_patient():
+            try:
+                patient = user.patientprofile
+            except PatientProfile.DoesNotExist:
+                return Response(
+                    {"error": "Profil patient introuvable."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            doctors = DoctorProfile.objects.filter(
+                appointments__patient=patient,
+                appointments__status__in=self.allowed_appointment_statuses,
+            ).select_related("user", "speciality").distinct()
+            existing = {
+                convo.doctor_id: convo.id
+                for convo in Conversation.objects.filter(patient=patient)
+            }
+            for doctor in doctors:
+                contacts.append(
+                    {
+                        "id": doctor.id,
+                        "name": f"Dr. {doctor.user.get_full_name()}".strip(),
+                        "subtitle": doctor.speciality.name if doctor.speciality else "Médecin",
+                        "role": "DOCTOR",
+                        "conversation_id": existing.get(doctor.id),
+                    }
+                )
+        elif user.is_doctor():
+            try:
+                doctor = user.doctorprofile
+            except DoctorProfile.DoesNotExist:
+                return Response(
+                    {"error": "Profil médecin introuvable."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+            patients = PatientProfile.objects.filter(
+                appointments__doctor=doctor,
+                appointments__status__in=self.allowed_appointment_statuses,
+            ).select_related("user").distinct()
+            existing = {
+                convo.patient_id: convo.id
+                for convo in Conversation.objects.filter(doctor=doctor)
+            }
+            for patient in patients:
+                contacts.append(
+                    {
+                        "id": patient.id,
+                        "name": patient.user.get_full_name(),
+                        "subtitle": patient.user.email,
+                        "role": "PATIENT",
+                        "conversation_id": existing.get(patient.id),
+                    }
+                )
+
+        return Response(contacts, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["post"])
+    def start(self, request):
+        serializer = StartConversationSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+
+        user = request.user
+        if user.is_patient():
+            try:
+                patient = user.patientprofile
+            except PatientProfile.DoesNotExist:
+                raise serializers.ValidationError("Profil patient introuvable.")
+            doctor = serializer.validated_data["doctor"]
+        else:
+            try:
+                doctor = user.doctorprofile
+            except DoctorProfile.DoesNotExist:
+                raise serializers.ValidationError("Profil médecin introuvable.")
+            patient = serializer.validated_data["patient"]
+
+        if not self._ensure_link(patient, doctor):
+            raise serializers.ValidationError(
+                "Cette conversation n'est autorisée qu'entre un patient et son médecin."
+            )
+
+        conversation, created = Conversation.objects.get_or_create(
+            patient=patient,
+            doctor=doctor,
+        )
+        output = ConversationSerializer(
+            conversation,
+            context={"request": request},
+        )
+        return Response(
+            output.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    @action(detail=True, methods=["get"])
+    def messages(self, request, pk=None):
+        conversation = self.get_object()
+        messages = conversation.messages.select_related("sender").all()
+        serializer = MessageSerializer(
+            messages,
+            many=True,
+            context={"request": request},
+        )
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    def send(self, request, pk=None):
+        conversation = self.get_object()
+        serializer = SendMessageSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        sender = request.user
+        if sender.id not in {conversation.patient.user_id, conversation.doctor.user_id}:
+            raise serializers.ValidationError("Vous ne participez pas à cette conversation.")
+
+        message = Message.objects.create(
+            conversation=conversation,
+            sender=sender,
+            content=serializer.validated_data["content"],
+        )
+
+        recipient = self._get_destination_user(conversation, sender)
+        sender_name = sender.get_full_name() or sender.username
+        self._create_message_notification(recipient, sender_name, message.content)
+
+        output = MessageSerializer(message, context={"request": request})
+        return Response(output.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"])
+    def mark_read(self, request, pk=None):
+        conversation = self.get_object()
+        updated = conversation.messages.filter(is_read=False).exclude(
+            sender=request.user
+        ).update(is_read=True)
+        return Response({"updated": updated}, status=status.HTTP_200_OK)
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -418,11 +631,19 @@ class AppointmentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        patient_id = self.request.query_params.get('patient')
+
         if user.is_patient():
-            return Appointment.objects.filter(patient__user=user)
+            queryset = Appointment.objects.filter(patient__user=user)
         elif user.is_doctor():
-            return Appointment.objects.filter(doctor__user=user)
-        return Appointment.objects.none()
+            queryset = Appointment.objects.filter(doctor__user=user)
+        else:
+            queryset = Appointment.objects.none()
+
+        if patient_id and user.is_doctor():
+            queryset = queryset.filter(patient_id=patient_id)
+
+        return queryset
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -442,6 +663,21 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         read_serializer = AppointmentSerializer(serializer.instance)
         headers = self.get_success_headers(read_serializer.data)
         return Response(read_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def update(self, request, *args, **kwargs):
+        raise serializers.ValidationError(
+            "La modification directe d'un rendez-vous n'est pas autorisée. Utilisez les actions métier dédiées."
+        )
+
+    def partial_update(self, request, *args, **kwargs):
+        raise serializers.ValidationError(
+            "La modification directe d'un rendez-vous n'est pas autorisée. Utilisez les actions métier dédiées."
+        )
+
+    def destroy(self, request, *args, **kwargs):
+        raise serializers.ValidationError(
+            "La suppression directe d'un rendez-vous n'est pas autorisée. Utilisez l'action d'annulation."
+        )
 
 class MedicalDocumentViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -632,4 +868,119 @@ class PatientMedicalRecordView(APIView):
         }
 
         return Response(response_data)
+
+
+class PatchedAppointmentViewSet(AppointmentViewSet):
+    def _create_notification(self, user, title, message):
+        from .models import Notification
+
+        Notification.objects.create(
+            user=user,
+            title=title,
+            message=message,
+            type='APPOINTMENT',
+        )
+
+    def perform_create(self, serializer):
+        super().perform_create(serializer)
+        appointment = serializer.instance
+        patient_name = appointment.patient.user.get_full_name() or appointment.patient.user.username
+        self._create_notification(
+            appointment.doctor.user,
+            "Nouvelle demande de rendez-vous",
+            f"{patient_name} a demandé un rendez-vous le {appointment.date:%Y-%m-%d à %H:%M}.",
+        )
+
+    def _ensure_doctor_owner(self, request, appointment):
+        if not request.user.is_doctor() or appointment.doctor.user != request.user:
+            raise serializers.ValidationError("Action réservée au médecin concerné par ce rendez-vous.")
+
+    def _ensure_patient_owner(self, request, appointment):
+        if not request.user.is_patient() or appointment.patient.user != request.user:
+            raise serializers.ValidationError("Action réservée au patient concerné par ce rendez-vous.")
+
+    @action(detail=True, methods=['post'])
+    def accept(self, request, pk=None):
+        appointment = self.get_object()
+        self._ensure_doctor_owner(request, appointment)
+
+        if appointment.status != 'PENDING':
+            raise serializers.ValidationError("Seuls les rendez-vous en attente peuvent être acceptés.")
+        if appointment.date <= timezone.now():
+            raise serializers.ValidationError("Impossible d'accepter un rendez-vous dont la date est dépassée.")
+
+        appointment.status = 'CONFIRMED'
+        appointment.refusal_reason = None
+        appointment.save(update_fields=['status', 'refusal_reason', 'updated_at'])
+
+        self._create_notification(
+            appointment.patient.user,
+            "Rendez-vous confirmé",
+            f"Votre rendez-vous du {appointment.date:%Y-%m-%d à %H:%M} avec Dr. {appointment.doctor.user.get_full_name()} a été confirmé.",
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def refuse(self, request, pk=None):
+        appointment = self.get_object()
+        self._ensure_doctor_owner(request, appointment)
+
+        if appointment.status != 'PENDING':
+            raise serializers.ValidationError("Seuls les rendez-vous en attente peuvent être refusés.")
+
+        appointment.status = 'REFUSED'
+        appointment.refusal_reason = request.data.get('reason') or None
+        appointment.save(update_fields=['status', 'refusal_reason', 'updated_at'])
+
+        self._create_notification(
+            appointment.patient.user,
+            "Rendez-vous refusé",
+            f"Votre demande du {appointment.date:%Y-%m-%d à %H:%M} n'a pas pu être acceptée.",
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        appointment = self.get_object()
+
+        if request.user.is_doctor():
+            self._ensure_doctor_owner(request, appointment)
+            actor_label = "Le médecin"
+            target_user = appointment.patient.user
+        elif request.user.is_patient():
+            self._ensure_patient_owner(request, appointment)
+            actor_label = "Le patient"
+            target_user = appointment.doctor.user
+        else:
+            raise serializers.ValidationError("Vous n'avez pas le droit d'annuler ce rendez-vous.")
+
+        if appointment.status not in ['PENDING', 'CONFIRMED']:
+            raise serializers.ValidationError("Ce rendez-vous ne peut plus être annulé.")
+
+        appointment.status = 'CANCELLED'
+        appointment.cancel_reason = request.data.get('reason') or None
+        appointment.save(update_fields=['status', 'cancel_reason', 'updated_at'])
+
+        if appointment.cancel_reason:
+            actor_label = f"{actor_label} (motif : {appointment.cancel_reason})"
+        self._create_notification(
+            target_user,
+            "Rendez-vous annulé",
+            f"{actor_label} a annulé le rendez-vous prévu le {appointment.date:%Y-%m-%d à %H:%M}.",
+        )
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
+    def complete(self, request, pk=None):
+        appointment = self.get_object()
+        self._ensure_doctor_owner(request, appointment)
+
+        if appointment.status != 'CONFIRMED':
+            raise serializers.ValidationError("Seuls les rendez-vous confirmés peuvent être marqués comme terminés.")
+        if appointment.date > timezone.now():
+            raise serializers.ValidationError("Impossible de terminer un rendez-vous qui n'a pas encore eu lieu.")
+
+        appointment.status = 'COMPLETED'
+        appointment.save(update_fields=['status', 'updated_at'])
+        return Response(AppointmentSerializer(appointment).data, status=status.HTTP_200_OK)
 

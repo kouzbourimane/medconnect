@@ -12,7 +12,8 @@ class DoctorAppointmentsScreen extends StatefulWidget {
   State<DoctorAppointmentsScreen> createState() => _DoctorAppointmentsScreenState();
 }
 
-class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> with SingleTickerProviderStateMixin {
+class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -28,7 +29,8 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
     final authViewModel = Provider.of<DoctorAuthViewModel>(context, listen: false);
     final token = authViewModel.authResponse?.token;
     if (token != null) {
-      await Provider.of<DoctorAppointmentViewModel>(context, listen: false).fetchAppointments(token);
+      await Provider.of<DoctorAppointmentViewModel>(context, listen: false)
+          .fetchAppointments(token);
     }
   }
 
@@ -52,7 +54,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
           indicatorColor: Colors.white,
           tabs: const [
             Tab(text: 'Demandes'),
-            Tab(text: 'À venir'),
+            Tab(text: 'A venir'),
             Tab(text: 'Historique'),
           ],
         ),
@@ -92,6 +94,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
       itemCount: appointments.length,
       itemBuilder: (context, index) {
         final appt = appointments[index];
+        final canComplete = !isPending &&
+            appt.status == Appointment.statusConfirmed &&
+            !appt.dateTime.isAfter(DateTime.now());
+
         return Card(
           margin: const EdgeInsets.only(bottom: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -122,7 +128,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
                             ),
                           ),
                           Text(
-                            appt.reason ?? 'Motif non spécifié',
+                            appt.reason ?? 'Motif non specifie',
                             style: TextStyle(color: Colors.grey[600]),
                           ),
                         ],
@@ -135,7 +141,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        appt.status,
+                        appt.statusLabel,
                         style: TextStyle(
                           color: _getStatusColor(appt.status),
                           fontWeight: FontWeight.bold,
@@ -172,25 +178,43 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
                         onPressed: () => _handleAction(context, appt, 'accept'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF567991),
+                          foregroundColor: Colors.white,
                         ),
                         child: const Text('Accepter'),
                       ),
                     ],
                   ),
                 ],
-                if (!isPending && appt.status == Appointment.statusConfirmed && appt.dateTime.isAfter(DateTime.now())) ...[
-                   const Divider(height: 24),
-                   Row(
+                if (!isPending &&
+                    appt.status == Appointment.statusConfirmed &&
+                    appt.dateTime.isAfter(DateTime.now())) ...[
+                  const Divider(height: 24),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
                         onPressed: () => _handleAction(context, appt, 'cancel'),
-                         style: TextButton.styleFrom(foregroundColor: Colors.red),
+                        style: TextButton.styleFrom(foregroundColor: Colors.red),
                         child: const Text('Annuler'),
                       ),
                     ],
-                   )
-                ]
+                  )
+                ],
+                if (canComplete) ...[
+                  const Divider(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ElevatedButton(
+                        onPressed: () => _handleAction(context, appt, 'complete'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                        ),
+                        child: const Text('Marquer termine'),
+                      ),
+                    ],
+                  )
+                ],
               ],
             ),
           ),
@@ -226,17 +250,53 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> wit
       if (action == 'accept') {
         await viewModel.acceptAppointment(token, appt.id);
       } else if (action == 'refuse') {
-        await viewModel.refuseAppointment(token, appt.id);
+        final reason = await _askReason(context, 'Motif du refus');
+        if (reason == null) return;
+        await viewModel.refuseAppointment(token, appt.id, reason: reason);
       } else if (action == 'cancel') {
-        await viewModel.cancelAppointment(token, appt.id);
+        final reason = await _askReason(context, 'Motif d annulation');
+        if (reason == null) return;
+        await viewModel.cancelAppointment(token, appt.id, reason: reason);
+      } else if (action == 'complete') {
+        await viewModel.completeAppointment(token, appt.id);
       }
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Action effectuée avec succès')),
+        const SnackBar(content: Text('Action effectuee avec succes')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur: $e')),
       );
     }
+  }
+
+  Future<String?> _askReason(BuildContext context, String title) async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(title),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: 'Motif',
+              border: OutlineInputBorder(),
+            ),
+            maxLines: 3,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Retour'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, controller.text.trim()),
+              child: const Text('Confirmer'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
