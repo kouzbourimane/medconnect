@@ -11,18 +11,39 @@ pipeline {
         PATH = "${env.PATH}:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools"
     }
 
+    triggers {
+        // Déclenche le pipeline automatiquement à chaque 'git push' sur GitHub
+        githubPush()
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 checkout scm
-                echo "Code clone avec succes"
+                echo "Code cloné avec succès"
+            }
+        }
+
+        // ==========================================
+        // STAGES BACKEND (Django)
+        // ==========================================
+        stage('Backend - Tests & Lint') {
+            steps {
+                dir('medconnect_app/medconnect-backend') {
+                    echo "Exécution des tests backend..."
+                    // Installation des dépendances et exécution des tests Django
+                    sh '''
+                    pip install -r requirements.txt
+                    python manage.py test
+                    '''
+                }
             }
         }
 
         stage('Backend - Build Docker Image') {
             steps {
                 dir('medconnect_app/medconnect-backend') {
-                    echo "Construction de l image Docker pour le backend..."
+                    echo "Construction de l'image Docker pour le backend..."
                     script {
                         dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${IMAGE_TAG}")
                     }
@@ -32,7 +53,7 @@ pipeline {
 
         stage('Backend - Push Image to DockerHub') {
             steps {
-                echo "Envoi de l image sur DockerHub..."
+                echo "Envoi de l'image sur DockerHub..."
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_HUB_CREDENTIALS_ID}") {
                         dockerImage.push()
@@ -44,33 +65,59 @@ pipeline {
 
         stage('Backend - Deploy to Kubernetes') {
             steps {
-                echo "Deploiement sur Kubernetes..."
+                echo "Déploiement sur Kubernetes..."
+                // On met à jour le fichier YAML avec le bon tag d'image généré par Jenkins
+                sh "sed -i 's|image: ${DOCKER_IMAGE_NAME}:.*|image: ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}|g' medconnect_app/k8s/backend-deployment.yaml"
                 sh 'kubectl apply -f medconnect_app/k8s/backend-deployment.yaml'
                 sh 'kubectl apply -f medconnect_app/k8s/backend-service.yaml'
             }
         }
 
+        // ==========================================
+        // STAGES FRONTEND (Flutter)
+        // ==========================================
+        stage('Frontend - Tests & Analyse') {
+            steps {
+                dir('medconnect_app/medconnect-frontend') {
+                    echo "Exécution de l'analyse et des tests frontend..."
+                    sh 'flutter pub get'
+                    // Analyse statique pour détecter les bugs potentiels
+                    sh 'flutter analyze'
+                    // Exécution des tests unitaires
+                    sh 'flutter test'
+                }
+            }
+        }
+
         stage('Frontend - Build APK') {
             steps {
-                echo "Construction de l APK Flutter..."
+                echo "Construction de l'APK Flutter..."
                 dir('medconnect_app/medconnect-frontend') {
-                    sh 'flutter pub get'
-                    sh 'flutter build apk --release'
+                    sh "flutter build apk --release --build-name=1.0.${IMAGE_TAG} --build-number=${IMAGE_TAG}"
                 }
             }
         }
 
         stage('Frontend - Deploy Firebase') {
             steps {
-                echo "Deploiement sur Firebase App Distribution..."
+                echo "Déploiement sur Firebase App Distribution..."
                 sh """
                     npx firebase appdistribution:distribute \
-                    medconnect_app/medconnect-frontend/build/app/outputs/flutter-apk/app-release.apk \
+                    build/app/outputs/flutter-apk/app-release.apk \
                     --app ${FIREBASE_APP_ID} \
                     --token ${FIREBASE_TOKEN} \
-                    --release-notes "Build ${IMAGE_TAG} - Deploiement automatique"
+                    --release-notes "Build ${IMAGE_TAG} - Déploiement automatique après succès des tests"
                 """
             }
+        }
+    }
+    
+    post {
+        success {
+            echo "✅ Pipeline terminé avec succès ! Le code a été testé, buildé et déployé."
+        }
+        failure {
+            echo "❌ Le pipeline a échoué. Consultez les logs (les tests ou le build ont retourné une erreur)."
         }
     }
 }
