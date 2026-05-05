@@ -30,12 +30,15 @@ pipeline {
         stage('Backend - Tests & Lint') {
             steps {
                 dir('medconnect_app/medconnect-backend') {
-                    echo "Exécution des tests backend..."
-                    // Installation des dépendances et exécution des tests Django
-                    sh '''
-                    pip install -r requirements.txt
-                    python manage.py test
-                    '''
+                    echo "Exécution des tests backend dans un conteneur Python..."
+                    script {
+                        docker.image('python:3.10-slim').inside {
+                            sh '''
+                            pip install -r requirements.txt
+                            python manage.py test
+                            '''
+                        }
+                    }
                 }
             }
         }
