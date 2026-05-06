@@ -86,6 +86,8 @@ WSGI_APPLICATION = 'backend_medconnect.wsgi.application'
 
 # ===== CONFIGURATION DE LA BASE DE DONNÉES NEON =====
 
+# ===== CONFIGURATION DE LA BASE DE DONNÉES NEON =====
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -98,6 +100,16 @@ DATABASES = {
     }
 }
 
+# SQLite en mémoire pour les tests Jenkins CI
+# Quand Jenkins lance les tests, il met CI=true
+# Django utilise alors SQLite au lieu de Neon (pas besoin de mot de passe)
+if os.environ.get('CI') == 'true':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }
 
 # ===== VALIDATION DES MOTS DE PASSE =====
 
