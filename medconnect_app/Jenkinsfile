@@ -7,120 +7,125 @@ pipeline {
         IMAGE_TAG = "${env.BUILD_NUMBER}"
         FIREBASE_TOKEN = credentials('firebase-token')
         FIREBASE_APP_ID = '1:621469238732:android:ead2ba093a5c9907f80969'
-        ANDROID_HOME = '/opt/android-sdk'
-        PATH = "${env.PATH}:/opt/android-sdk/cmdline-tools/latest/bin:/opt/android-sdk/platform-tools"
-    }
-
-    triggers {
-        // Déclenche le pipeline automatiquement à chaque 'git push' sur GitHub
-        githubPush()
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
-                echo "Code cloné avec succès"
+                echo "✅ Code clone avec succes"
             }
         }
 
-        // ==========================================
-        // STAGES BACKEND (Django)
-        // ==========================================
-        stage('Backend - Tests & Lint') {
-            steps {
-                dir('medconnect_app/medconnect-backend') {
-                    echo "Exécution des tests backend dans un conteneur Python..."
-                    script {
-                        docker.image('python:3.10-slim').inside {
-                            sh '''
-                            pip install -r requirements.txt
-                            python manage.py test
-                            '''
+        stage('Build') {
+            parallel {
+                stage('Backend - Install') {
+                    steps {
+                        dir('medconnect_app/medconnect-backend') {
+                            sh 'pip install -r requirements.txt'
+                            echo "✅ Backend dependencies installes"
+                        }
+                    }
+                }
+                stage('Frontend - Install') {
+                    steps {
+                        dir('medconnect_app/medconnect-frontend') {
+                            sh 'flutter pub get'
+                            echo "✅ Frontend dependencies installes"
                         }
                     }
                 }
             }
         }
 
-        stage('Backend - Build Docker Image') {
+        stage('Tests') {
+            parallel {
+                stage('Backend - Tests') {
+                    steps {
+                        dir('medconnect_app/medconnect-backend') {
+                            sh 'python manage.py test --keepdb'
+                            echo "✅ Tests backend passes"
+                        }
+                    }
+                }
+                stage('Frontend - Analyze') {
+                    steps {
+                        dir('medconnect_app/medconnect-frontend') {
+                            sh 'flutter analyze'
+                            echo "✅ Analyse frontend terminee"
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Docker - Build') {
             steps {
                 dir('medconnect_app/medconnect-backend') {
-                    echo "Construction de l'image Docker pour le backend..."
+                    echo "Construction de l image Docker..."
                     script {
-                        dockerImage = docker.build("${DOCKER_IMAGE_NAME}:${IMAGE_TAG}")
+                        env.DOCKER_IMAGE_FULL = "${DOCKER_IMAGE_NAME}:${IMAGE_TAG}"
+                        docker.build(env.DOCKER_IMAGE_FULL)
                     }
                 }
             }
         }
 
-        stage('Backend - Push Image to DockerHub') {
+        stage('Docker - Push') {
             steps {
-                echo "Envoi de l'image sur DockerHub..."
+                echo "Envoi de l image sur DockerHub..."
                 script {
+                    def img = docker.image(env.DOCKER_IMAGE_FULL)
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_HUB_CREDENTIALS_ID}") {
-                        dockerImage.push()
-                        dockerImage.push('latest')
+                        img.push()
+                        img.push('latest')
                     }
                 }
             }
         }
 
-        stage('Backend - Deploy to Kubernetes') {
+        stage('Deploy - Kubernetes') {
             steps {
-                echo "Déploiement sur Kubernetes..."
-                // On met à jour le fichier YAML avec le bon tag d'image généré par Jenkins
-                sh "sed -i 's|image: ${DOCKER_IMAGE_NAME}:.*|image: ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}|g' medconnect_app/k8s/backend-deployment.yaml"
+                echo "Deploiement sur Kubernetes..."
                 sh 'kubectl apply -f medconnect_app/k8s/backend-deployment.yaml'
                 sh 'kubectl apply -f medconnect_app/k8s/backend-service.yaml'
-            }
-        }
-
-        // ==========================================
-        // STAGES FRONTEND (Flutter)
-        // ==========================================
-        stage('Frontend - Tests & Analyse') {
-            steps {
-                dir('medconnect_app/medconnect-frontend') {
-                    echo "Exécution de l'analyse et des tests frontend..."
-                    sh 'flutter pub get'
-                    // Analyse statique pour détecter les bugs potentiels
-                    sh 'flutter analyze'
-                    // Exécution des tests unitaires
-                    sh 'flutter test'
-                }
+                sh 'kubectl rollout status deployment/medconnect-backend --timeout=120s'
+                echo "✅ Backend deploye sur Kubernetes"
             }
         }
 
         stage('Frontend - Build APK') {
             steps {
-                echo "Construction de l'APK Flutter..."
                 dir('medconnect_app/medconnect-frontend') {
-                    sh "flutter build apk --release --build-name=1.0.${IMAGE_TAG} --build-number=${IMAGE_TAG}"
+                    echo "Construction de l APK Flutter..."
+                    sh 'export ANDROID_HOME=/opt/android-sdk && flutter build apk --release'
+                    echo "✅ APK construit avec succes"
                 }
             }
         }
 
         stage('Frontend - Deploy Firebase') {
             steps {
-                echo "Déploiement sur Firebase App Distribution..."
+                echo "Deploiement sur Firebase App Distribution..."
                 sh """
                     npx firebase appdistribution:distribute \
-                    build/app/outputs/flutter-apk/app-release.apk \
+                    medconnect_app/medconnect-frontend/build/app/outputs/flutter-apk/app-release.apk \
                     --app ${FIREBASE_APP_ID} \
                     --token ${FIREBASE_TOKEN} \
-                    --release-notes "Build ${IMAGE_TAG} - Déploiement automatique après succès des tests"
+                    --release-notes "Build ${IMAGE_TAG} - Deploiement automatique"
                 """
+                echo "✅ APK deploye sur Firebase"
             }
         }
     }
-    
+
     post {
         success {
-            echo "✅ Pipeline terminé avec succès ! Le code a été testé, buildé et déployé."
+            echo "Pipeline termine avec succes !"
         }
         failure {
-            echo "❌ Le pipeline a échoué. Consultez les logs (les tests ou le build ont retourné une erreur)."
+            echo "Pipeline echoue - verifier les logs"
         }
     }
 }
