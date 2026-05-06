@@ -23,7 +23,7 @@ pipeline {
                 stage('Backend - Install') {
                     steps {
                         dir('medconnect_app/medconnect-backend') {
-                            sh 'pip install -r requirements.txt'
+                            sh 'pip3 install -r requirements.txt'
                             echo "✅ Backend dependencies installes"
                         }
                     }
