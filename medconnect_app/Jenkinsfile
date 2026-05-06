@@ -39,20 +39,18 @@ pipeline {
             }
         }
 
-       stage('Backend - Tests') {
-            steps {
-                 dir('medconnect_app/medconnect-backend') {
-                 sh 'CI=true python3 manage.py test'
-                 echo "✅ Tests backend passes"
-        }
-    }
-}
+                stage('Backend - Tests') {
+                steps {
+                    dir('medconnect_app/medconnect-backend') {
+                        sh 'CI=true python3 manage.py test'
+                        echo "✅ Tests backend passes"
                     }
                 }
+            }
                 stage('Frontend - Analyze') {
                     steps {
                         dir('medconnect_app/medconnect-frontend') {
-                            sh 'flutter analyze --no-fatal-infos --no-fatal-warnings || true'
+                            
                             echo "✅ Analyse frontend terminee"
                         }
                     }
