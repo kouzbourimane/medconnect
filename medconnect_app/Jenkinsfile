@@ -39,14 +39,14 @@ pipeline {
             }
         }
 
-        stage('Tests') {
-            parallel {
-                stage('Backend - Tests') {
-                    steps {
-                        dir('medconnect_app/medconnect-backend') {
-                            sh 'python3 manage.py test --keepdb'
-                            echo "✅ Tests backend passes"
-                        }
+       stage('Backend - Tests') {
+            steps {
+                 dir('medconnect_app/medconnect-backend') {
+                 sh 'CI=true python3 manage.py test'
+                 echo "✅ Tests backend passes"
+        }
+    }
+}
                     }
                 }
                 stage('Frontend - Analyze') {
