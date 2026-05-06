@@ -52,7 +52,8 @@ pipeline {
                 stage('Frontend - Analyze') {
                     steps {
                         dir('medconnect_app/medconnect-frontend') {
-                            sh 'flutter analyze --no-fatal-infos --no-fatal-warnings || true'
+                            //sh 'flutter analyze --no-fatal-infos --no-fatal-warnings || true'
+                            sh 'flutter analyze --no-fatal-infos --no-fatal-warnings'
                             echo "✅ Analyse frontend terminee"
                         }
                     }
