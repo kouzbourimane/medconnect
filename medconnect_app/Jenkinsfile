@@ -99,7 +99,7 @@ pipeline {
             steps {
                 dir('medconnect_app/medconnect-frontend') {
                     echo "Construction de l APK Flutter..."
-                    sh 'export ANDROID_HOME=/opt/android-sdk && flutter build apk --release'
+                    sh 'export ANDROID_HOME=/opt/android-sdk && flutter build apk --release --verbose'
                     echo "✅ APK construit avec succes"
                 }
             }
