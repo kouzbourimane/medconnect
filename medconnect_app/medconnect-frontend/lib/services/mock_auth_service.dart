@@ -117,6 +117,30 @@ class MockAuthService implements AuthService {
       throw Exception('Identifiants incorrects');
     }
   }
+  @override
+Future<AuthResponse> registerDoctor(Map<String, dynamic> data) async {
+  await _simulateDelay();
+
+  final utilisateur = Utilisateur(
+    id: 3,
+    username: data['username'] ?? '',
+    firstName: data['first_name'] ?? '',
+    lastName: data['last_name'] ?? '',
+    email: data['email'] ?? '',
+    phone: data['phone'] ?? '',
+    role: 'DOCTOR',
+    dateOfBirth: null,
+    address: null,
+    isActive: true,
+  );
+
+  return AuthResponse(
+    token: "mock_jwt_token_doctor_register",
+    user: utilisateur,
+    patient_profile: null,
+    message: "Inscription médecin réussie",
+  );
+}
 
   @override
   Future<void> logout() async {

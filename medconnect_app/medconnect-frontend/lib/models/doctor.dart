@@ -5,6 +5,8 @@
   final String speciality;
   final double consultationFee;
   final String? bio;
+  final String phone;
+  final bool isAvailable;
 
   Doctor({
     required this.id,
@@ -13,6 +15,8 @@
     required this.speciality,
     required this.consultationFee,
     this.bio,
+    this.phone = '',
+    this.isAvailable = true,
   });
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
@@ -25,6 +29,8 @@
           ? double.tryParse(json['consultation_fee'].toString()) ?? 0.0
           : 0.0,
       bio: json['bio'],
+      phone: json['user']['phone'] ?? '',
+      isAvailable: json['is_available'] ?? true,
     );
   }
 
