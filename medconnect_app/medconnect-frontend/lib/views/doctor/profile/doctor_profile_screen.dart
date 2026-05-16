@@ -33,7 +33,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mon Profil'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -101,7 +101,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen>
           const SizedBox(height: 24),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF567991),
+              backgroundColor: const Color(0xFF388E3C),
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
             ),

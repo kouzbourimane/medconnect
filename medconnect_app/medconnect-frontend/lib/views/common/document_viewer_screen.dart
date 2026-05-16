@@ -29,7 +29,7 @@ class DocumentViewerScreen extends StatelessWidget {
           title,
           style: const TextStyle(color: Colors.white, fontSize: 16),
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(

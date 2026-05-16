@@ -15,7 +15,7 @@ class DocumentTypeBadge extends StatelessWidget {
 
     switch (type) {
       case 'ORDONNANCE':
-        color = const Color(0xFF567991);
+        color = const Color(0xFF388E3C);
         icon = Icons.description;
         label = 'Ordonnance';
         break;
@@ -97,7 +97,7 @@ class DocumentCard extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF2C3E50),
+                              color: Color(0xFF1B5E20),
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -110,7 +110,7 @@ class DocumentCard extends StatelessWidget {
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF86B7D7).withOpacity(0.2),
+                              color: const Color(0xFF81C784).withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
@@ -118,7 +118,7 @@ class DocumentCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF567991),
+                                color: Color(0xFF388E3C),
                               ),
                             ),
                           ),
@@ -136,7 +136,7 @@ class DocumentCard extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Color(0xFF567991),
+                          color: Color(0xFF388E3C),
                         ),
                       ),
                     const SizedBox(height: 8),
@@ -160,7 +160,7 @@ class DocumentCard extends StatelessWidget {
     switch (document.documentType) {
       case 'ORDONNANCE':
         icon = Icons.description_outlined;
-        color = const Color(0xFF567991);
+        color = const Color(0xFF388E3C);
         break;
       case 'ANALYSE':
         icon = Icons.science_outlined;
@@ -189,7 +189,7 @@ class DocumentCard extends StatelessWidget {
         IconButton(
           icon: const Icon(
             Icons.remove_red_eye_outlined,
-            color: Color(0xFF567991),
+            color: Color(0xFF388E3C),
           ),
           onPressed: onView,
           tooltip: 'Voir',
@@ -197,7 +197,7 @@ class DocumentCard extends StatelessWidget {
           padding: const EdgeInsets.all(8),
         ),
         IconButton(
-          icon: const Icon(Icons.download_outlined, color: Color(0xFF567991)),
+          icon: const Icon(Icons.download_outlined, color: Color(0xFF388E3C)),
           onPressed: onDownload,
           tooltip: 'Télécharger',
           constraints: const BoxConstraints(),

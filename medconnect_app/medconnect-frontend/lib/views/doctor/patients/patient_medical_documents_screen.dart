@@ -44,7 +44,7 @@ class _PatientMedicalDocumentsScreenState extends State<PatientMedicalDocumentsS
         onPressed: () => _showOptions(context),
         label: const Text("Ajouter Document"),
         icon: const Icon(Icons.note_add),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: Consumer<DoctorMedicalDocumentViewModel>(
         builder: (context, viewModel, child) {
@@ -79,7 +79,7 @@ class _PatientMedicalDocumentsScreenState extends State<PatientMedicalDocumentsS
     switch (doc.documentType) {
       case 'ORDONNANCE':
         icon = Icons.medication;
-        color = Colors.blue;
+        color = Colors.green;
         break;
       case 'ANALYSE':
         icon = Icons.science;

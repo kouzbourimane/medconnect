@@ -28,9 +28,9 @@ class _LoginPatientPageState extends State<LoginPatientPage> {
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context);
 
-    // Medical Blue Palette
-    const primaryColor = Color(0xFF86B7D7);
-    const lightBackground = Color(0xFFC3E2F6);
+    // Medical Green Palette
+    const primaryColor = Color(0xFF81C784);
+    const lightBackground = Color(0xFFC8E6C9);
 
     return Scaffold(
       backgroundColor: lightBackground,
@@ -198,7 +198,7 @@ class _LoginPatientPageState extends State<LoginPatientPage> {
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       filled: true,
-      fillColor: const Color(0xFFF5F9FC),
+      fillColor: const Color(0xFFF1F8E9),
     );
   }
 }

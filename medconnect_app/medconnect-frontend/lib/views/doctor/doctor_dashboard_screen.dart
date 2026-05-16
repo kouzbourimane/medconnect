@@ -57,7 +57,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
     // I should move the original dashboard content to a separate method or widget or just condition it here.
     
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       // AppBar needs to change or stay generic? 
       // The original AppBar had logic for dashboard. Let's keep it for now but maybe make it conditional if needed.
       // For simplicity, let's keep the same AppBar for now or update it.
@@ -66,7 +66,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
       body: _currentIndex == 0 ? _buildDashboardBody(context) : _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF567991),
+        selectedItemColor: const Color(0xFF388E3C),
         unselectedItemColor: Colors.grey,
         currentIndex: _currentIndex,
         items: const [
@@ -102,7 +102,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
           'Bonjour, Dr. $doctorName',
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         actions: [
           Stack(
             children: [
@@ -168,7 +168,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C3E50),
+                            color: Color(0xFF1B5E20),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -179,7 +179,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C3E50),
+                            color: Color(0xFF1B5E20),
                           ),
                         ),
                         const SizedBox(height: 10),
@@ -214,11 +214,11 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                     : "D",
                 style: const TextStyle(
                   fontSize: 40.0,
-                  color: Color(0xFF567991),
+                  color: Color(0xFF388E3C),
                 ),
               ),
             ),
-            decoration: const BoxDecoration(color: Color(0xFF567991)),
+            decoration: const BoxDecoration(color: Color(0xFF388E3C)),
           ),
           ListTile(
             leading: const Icon(Icons.dashboard),
@@ -254,7 +254,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
 
       return Row(
           children: [
-              Expanded(child: _buildStatCard("Patients Vus", "$patients", Icons.people, Colors.blue)),
+              Expanded(child: _buildStatCard("Patients Vus", "$patients", Icons.people, Colors.green)),
               const SizedBox(width: 10),
               Expanded(child: _buildStatCard("RDV à venir", "$upcoming", Icons.calendar_month, Colors.orange)),
                const SizedBox(width: 10),
@@ -310,7 +310,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
                       leading: CircleAvatar(
-                          backgroundColor: const Color(0xFFF5F9FC),
+                          backgroundColor: const Color(0xFFF1F8E9),
                           child: Icon(Icons.person, color: Colors.grey[600]),
                       ),
                       title: Text(appt.doctorName, style: const TextStyle(fontWeight: FontWeight.bold)), // Using doctorName field for Patient Name
@@ -354,7 +354,7 @@ class _DoctorDashboardScreenState extends State<DoctorDashboardScreen> {
         final notif = notifications[i];
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: const Color(0xFFF5F9FC),
+            backgroundColor: const Color(0xFFF1F8E9),
             child: Icon(Icons.notifications_none, color: Colors.grey[600]),
           ),
           title: Text(

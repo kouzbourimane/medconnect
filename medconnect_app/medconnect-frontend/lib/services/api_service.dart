@@ -5,7 +5,7 @@ import '../models/auth_response.dart';
 import '../models/patient_profile_model.dart';
 
 class ApiService {
-  static const String baseUrl = "http://192.168.49.2:30961";
+  static const String baseUrl = "http://127.0.0.1:8000";
   static const String apiPrefix = "$baseUrl/api";
 
   Future<AuthResponse> registerPatient(RegisterRequest request) async {

@@ -91,14 +91,14 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                             final contact = contacts[index];
                             return ListTile(
                               leading: CircleAvatar(
-                                backgroundColor: const Color(0xFF567991)
+                                backgroundColor: const Color(0xFF388E3C)
                                     .withOpacity(0.12),
                                 child: Text(
                                   contact.name.isNotEmpty
                                       ? contact.name[0].toUpperCase()
                                       : '?',
                                   style: const TextStyle(
-                                    color: Color(0xFF567991),
+                                    color: Color(0xFF388E3C),
                                   ),
                                 ),
                               ),
@@ -156,10 +156,10 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
     final viewModel = context.watch<MessagesViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text('Messages'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: viewModel.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -198,7 +198,7 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
                 ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openContacts,
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         icon: const Icon(Icons.add_comment_outlined),
         label: const Text('Nouveau'),
       ),
@@ -216,13 +216,13 @@ class _ConversationsScreenState extends State<ConversationsScreen> {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: CircleAvatar(
-          backgroundColor: const Color(0xFF567991).withOpacity(0.12),
+          backgroundColor: const Color(0xFF388E3C).withOpacity(0.12),
           child: Text(
             conversation.counterpartName.isNotEmpty
                 ? conversation.counterpartName[0].toUpperCase()
                 : '?',
             style: const TextStyle(
-              color: Color(0xFF567991),
+              color: Color(0xFF388E3C),
               fontWeight: FontWeight.bold,
             ),
           ),

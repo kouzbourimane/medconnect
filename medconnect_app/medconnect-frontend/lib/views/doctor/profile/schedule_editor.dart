@@ -121,7 +121,7 @@ class _ScheduleEditorState extends State<ScheduleEditor> {
                                 fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.add_circle, color: Color(0xFF567991)),
+                            icon: const Icon(Icons.add_circle, color: Color(0xFF388E3C)),
                             onPressed: () => _addRange(day),
                           ),
                         ],
@@ -161,7 +161,7 @@ class _ScheduleEditorState extends State<ScheduleEditor> {
           padding: const EdgeInsets.all(16.0),
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF567991),
+              backgroundColor: const Color(0xFF388E3C),
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 50),
             ),

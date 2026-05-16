@@ -88,7 +88,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
                     border: Border.all(
                       color: !_hasFile
                           ? Colors.grey[400]!
-                          : const Color(0xFF567991),
+                          : const Color(0xFF388E3C),
                       style: BorderStyle.solid,
                     ),
                   ),
@@ -101,7 +101,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
                             : Icons.check_circle,
                         color: !_hasFile
                             ? Colors.grey
-                            : const Color(0xFF567991),
+                            : const Color(0xFF388E3C),
                         size: 32,
                       ),
                       const SizedBox(height: 8),
@@ -182,7 +182,7 @@ class _UploadDocumentDialogState extends State<UploadDocumentDialog> {
                   }
                 },
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF567991),
+            backgroundColor: const Color(0xFF388E3C),
             foregroundColor: Colors.white,
           ),
           child: const Text('Uploader'),

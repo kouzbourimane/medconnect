@@ -36,7 +36,7 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Calendrier'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: Column(
         children: [
@@ -124,9 +124,9 @@ class _DoctorCalendarScreenState extends State<DoctorCalendarScreen> {
           child: Container(
             margin: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: isSelected ? const Color(0xFF567991) : null,
+              color: isSelected ? const Color(0xFF388E3C) : null,
               shape: BoxShape.circle,
-              border: isToday(date) && !isSelected ? Border.all(color: const Color(0xFF567991)) : null,
+              border: isToday(date) && !isSelected ? Border.all(color: const Color(0xFF388E3C)) : null,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

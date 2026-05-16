@@ -51,7 +51,7 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
-                  color: Color.fromARGB(255, 86, 121, 145),
+                  color: Color(0xFF388E3C),
                   width: 2,
                 ),
               ),
@@ -95,7 +95,7 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: const BorderSide(
-                  color: Color.fromARGB(255, 86, 121, 145),
+                  color: Color(0xFF388E3C),
                   width: 2,
                 ),
               ),
@@ -117,7 +117,7 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
               },
               child: const Text(
                 'Mot de passe oublié ?',
-                style: TextStyle(color: Color.fromARGB(255, 86, 121, 145)),
+                style: TextStyle(color: Color(0xFF388E3C)),
               ),
             ),
           ),
@@ -159,7 +159,7 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
                       }
                     },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 86, 121, 145),
+                backgroundColor: const Color(0xFF388E3C),
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -204,7 +204,7 @@ class _DoctorLoginFormState extends State<DoctorLoginForm> {
                 child: const Text(
                   "S'inscrire",
                   style: TextStyle(
-                    color: Color.fromARGB(255, 86, 121, 145),
+                    color: Color(0xFF388E3C),
                     fontWeight: FontWeight.bold,
                   ),
                 ),

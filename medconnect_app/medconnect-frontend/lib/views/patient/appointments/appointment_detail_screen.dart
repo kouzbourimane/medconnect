@@ -13,10 +13,10 @@ class AppointmentDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text('Details du Rendez-vous'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -93,11 +93,11 @@ class AppointmentDetailScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 40,
-            backgroundColor: const Color(0xFF567991).withOpacity(0.1),
+            backgroundColor: const Color(0xFF388E3C).withOpacity(0.1),
             child: const Icon(
               Icons.calendar_today,
               size: 40,
-              color: Color(0xFF567991),
+              color: Color(0xFF388E3C),
             ),
           ),
           const SizedBox(height: 10),
@@ -149,7 +149,7 @@ class AppointmentDetailScreen extends StatelessWidget {
       case Appointment.statusRefused:
         return Colors.red;
       case Appointment.statusCompleted:
-        return Colors.blue;
+        return Colors.green;
       default:
         return Colors.grey;
     }

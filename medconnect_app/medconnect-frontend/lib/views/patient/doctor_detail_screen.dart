@@ -9,10 +9,10 @@ class DoctorDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: Text(doctor.fullName),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -22,7 +22,7 @@ class DoctorDetailScreen extends StatelessWidget {
             Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: const Color(0xFF567991),
+                backgroundColor: const Color(0xFF388E3C),
                 child: Text(
                   doctor.firstName.isNotEmpty ? doctor.firstName[0] : 'D',
                   style: const TextStyle(fontSize: 40, color: Colors.white),
@@ -36,7 +36,7 @@ class DoctorDetailScreen extends StatelessWidget {
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
+                  color: Color(0xFF1B5E20),
                 ),
               ),
             ),
@@ -45,7 +45,7 @@ class DoctorDetailScreen extends StatelessWidget {
                 doctor.speciality,
                 style: const TextStyle(
                   fontSize: 18,
-                  color: Color(0xFF567991),
+                  color: Color(0xFF388E3C),
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -99,7 +99,7 @@ class DoctorDetailScreen extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: const Color(0xFF567991), size: 28),
+            Icon(icon, color: const Color(0xFF388E3C), size: 28),
             const SizedBox(width: 16),
             Expanded(
               child: Column(

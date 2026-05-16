@@ -83,12 +83,12 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'MedConnect',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
-          scaffoldBackgroundColor: const Color(0xFFF5F9FC),
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+          primarySwatch: Colors.green,
+          scaffoldBackgroundColor: const Color(0xFFF1F8E9),
+          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)
               .copyWith(
-                primary: const Color(0xFF567991),
-                secondary: const Color(0xFF86B7D7),
+                primary: const Color(0xFF388E3C),
+                secondary: const Color(0xFF81C784),
               ),
         ),
         home: const CombinedLoginScreen(),

@@ -42,7 +42,7 @@ class _PatientMedicalFolderScreenState extends State<PatientMedicalFolderScreen>
         onPressed: () => _showAddRecordDialog(context),
         label: const Text("Ajouter Note / Prescription"),
         icon: const Icon(Icons.add),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: Consumer<DoctorMedicalRecordViewModel>(
         builder: (context, viewModel, child) {
@@ -77,10 +77,10 @@ class _PatientMedicalFolderScreenState extends State<PatientMedicalFolderScreen>
       child: ExpansionTile(
         title: Text(
           record.title, 
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF567991))
+          style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF388E3C))
         ),
         subtitle: Text("Dr. ${record.doctorName} - ${dateFormat.format(record.recordDate)}"),
-        leading: const Icon(Icons.folder_shared, color: Color(0xFF567991)),
+        leading: const Icon(Icons.folder_shared, color: Color(0xFF388E3C)),
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -173,7 +173,7 @@ class _AddMedicalRecordDialogState extends State<AddMedicalRecordDialog> {
         ElevatedButton(
           onPressed: _submit,
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF567991),
+            backgroundColor: const Color(0xFF388E3C),
             foregroundColor: Colors.white,
           ),
           child: const Text("Enregistrer"),

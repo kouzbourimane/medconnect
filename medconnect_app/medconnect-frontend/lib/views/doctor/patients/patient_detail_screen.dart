@@ -42,7 +42,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> with SingleTi
     return Scaffold(
       appBar: AppBar(
         title: Text(fullName),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         bottom: TabBar(
           controller: _tabController,
           isScrollable: true,
@@ -100,7 +100,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> with SingleTi
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF567991))),
+            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF388E3C))),
             const Divider(),
             ...children,
           ],
@@ -176,7 +176,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> with SingleTi
   Color _getStatusColor(String status) {
     switch (status) {
       case Appointment.statusConfirmed:
-        return Colors.blue;
+        return Colors.green;
       case Appointment.statusPending:
         return Colors.orange;
       case Appointment.statusCancelled:

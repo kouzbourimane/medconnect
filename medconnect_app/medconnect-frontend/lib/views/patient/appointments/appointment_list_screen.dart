@@ -49,10 +49,10 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text('Mes Rendez-vous'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
@@ -93,7 +93,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
             ),
           );
         },
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         child: const Icon(Icons.add),
       ),
     );
@@ -115,10 +115,10 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
           ),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: const Color(0xFF567991).withOpacity(0.1),
+              backgroundColor: const Color(0xFF388E3C).withOpacity(0.1),
               child: const Icon(
                 Icons.medical_services,
-                color: Color(0xFF567991),
+                color: Color(0xFF388E3C),
               ),
             ),
             title: Text(
@@ -179,7 +179,7 @@ class _AppointmentListScreenState extends State<AppointmentListScreen>
         text = 'Refuse';
         break;
       case Appointment.statusCompleted:
-        color = Colors.blue;
+        color = Colors.green;
         text = 'Termine';
         break;
       default:

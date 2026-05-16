@@ -145,10 +145,10 @@ class _ChatScreenState extends State<ChatScreen> {
     final viewModel = context.watch<MessagesViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: Text(widget.conversation.counterpartName),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: Column(
         children: [
@@ -197,7 +197,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         children: [
                           const Icon(
                             Icons.attach_file,
-                            color: Color(0xFF567991),
+                            color: Color(0xFF388E3C),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
@@ -225,7 +225,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           onPressed: _isSending ? null : _pickAttachment,
                           icon: const Icon(
                             Icons.attach_file,
-                            color: Color(0xFF567991),
+                            color: Color(0xFF388E3C),
                           ),
                         ),
                       ),
@@ -238,7 +238,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           decoration: InputDecoration(
                             hintText: 'Écrire un message...',
                             filled: true,
-                            fillColor: const Color(0xFFF5F9FC),
+                            fillColor: const Color(0xFFF1F8E9),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(14),
                               borderSide: BorderSide.none,
@@ -249,7 +249,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       const SizedBox(width: 10),
                       CircleAvatar(
                         radius: 24,
-                        backgroundColor: const Color(0xFF567991),
+                        backgroundColor: const Color(0xFF388E3C),
                         child: IconButton(
                           onPressed: _isSending ? null : _sendMessage,
                           icon: _isSending
@@ -291,7 +291,7 @@ class _ChatScreenState extends State<ChatScreen> {
               attachment.isImage
                   ? Icons.image_outlined
                   : Icons.picture_as_pdf_outlined,
-              color: isMine ? Colors.white : const Color(0xFF567991),
+              color: isMine ? Colors.white : const Color(0xFF388E3C),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -323,7 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         constraints: const BoxConstraints(maxWidth: 290),
         decoration: BoxDecoration(
-          color: message.isMine ? const Color(0xFF567991) : Colors.white,
+          color: message.isMine ? const Color(0xFF388E3C) : Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(
@@ -339,7 +339,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF567991),
+                    color: Color(0xFF388E3C),
                   ),
                 ),
               ),

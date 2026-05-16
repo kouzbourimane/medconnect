@@ -31,9 +31,9 @@ class _RegisterDoctorScreenState extends State<RegisterDoctorScreen> {
   Widget build(BuildContext context) {
     final authViewModel = Provider.of<AuthViewModel>(context);
 
-    // Medical Blue Palette
-    const primaryColor = Color.fromARGB(255, 86, 121, 145);
-    const lightBackground = Color.fromARGB(255, 213, 231, 243);
+    // Medical Green Palette
+    const primaryColor = Color(0xFF388E3C);
+    const lightBackground = Color(0xFFC8E6C9);
 
     return Scaffold(
       backgroundColor: lightBackground,
@@ -359,7 +359,7 @@ class _RegisterDoctorScreenState extends State<RegisterDoctorScreen> {
                             child: const Text(
                               "Se connecter",
                               style: TextStyle(
-                                color: Color.fromARGB(255, 86, 121, 145),
+                                color: Color(0xFF388E3C),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -389,8 +389,8 @@ class _RegisterDoctorScreenState extends State<RegisterDoctorScreen> {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       filled: true,
       fillColor: const Color(
-        0xFFF5F9FC,
-      ), // Very light blue/grey for input background
+        0xFFF1F8E9,
+      ), // Very light green/grey for input background
     );
   }
 

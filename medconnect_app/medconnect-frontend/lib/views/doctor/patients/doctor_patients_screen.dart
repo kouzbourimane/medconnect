@@ -36,7 +36,7 @@ class _DoctorPatientsScreenState extends State<DoctorPatientsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mes Patients'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: Column(
         children: [
@@ -79,7 +79,7 @@ class _DoctorPatientsScreenState extends State<DoctorPatientsScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: ListTile(
                         leading: CircleAvatar(
-                          backgroundColor: const Color(0xFF567991),
+                          backgroundColor: const Color(0xFF388E3C),
                           child: Text(
                              (user.firstName != null && user.firstName!.isNotEmpty) 
                                 ? user.firstName![0].toUpperCase() 

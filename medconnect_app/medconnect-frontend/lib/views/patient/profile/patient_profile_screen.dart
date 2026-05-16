@@ -36,13 +36,13 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
     final user = authVM.authResponse?.user;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text(
           'Mon Profil',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
@@ -52,7 +52,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
       ),
       body: profileVM.isLoading
           ? const Center(
-              child: CircularProgressIndicator(color: Color(0xFF567991)),
+              child: CircularProgressIndicator(color: Color(0xFF388E3C)),
             )
           : RefreshIndicator(
               onRefresh: () async {
@@ -126,14 +126,14 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                                     ),
                                     decoration: BoxDecoration(
                                       color: const Color(
-                                        0xFF567991,
+                                        0xFF388E3C,
                                       ).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
                                       profileVM.profileData!.bloodType!,
                                       style: const TextStyle(
-                                        color: Color(0xFF567991),
+                                        color: Color(0xFF388E3C),
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -239,7 +239,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
                           style: TextStyle(color: Colors.white, fontSize: 16),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF567991),
+                          backgroundColor: const Color(0xFF388E3C),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -270,7 +270,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
         style: const TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF567991),
+          color: Color(0xFF388E3C),
         ),
       ),
     );
@@ -281,7 +281,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF86B7D7), size: 24),
+          Icon(icon, color: const Color(0xFF81C784), size: 24),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -327,7 +327,7 @@ class _PatientProfileScreenState extends State<PatientProfileScreen> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         children: [
-          const Icon(Icons.calculate, color: Color(0xFF86B7D7), size: 24),
+          const Icon(Icons.calculate, color: Color(0xFF81C784), size: 24),
           const SizedBox(width: 16),
           Expanded(
             child: Column(

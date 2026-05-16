@@ -64,13 +64,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final authVM = context.watch<PatientAuthViewModel>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text(
           'Modifier le Profil',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: profileVM.isLoading
@@ -130,7 +130,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: OutlinedButton(
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 12),
-                              side: const BorderSide(color: Color(0xFF567991)),
+                              side: const BorderSide(color: Color(0xFF388E3C)),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -138,7 +138,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             onPressed: () => Navigator.pop(context),
                             child: const Text(
                               "Annuler",
-                              style: TextStyle(color: Color(0xFF567991)),
+                              style: TextStyle(color: Color(0xFF388E3C)),
                             ),
                           ),
                         ),
@@ -146,7 +146,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Expanded(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF567991),
+                              backgroundColor: const Color(0xFF388E3C),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -181,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Color(0xFF567991),
+          color: Color(0xFF388E3C),
         ),
       ),
     );
@@ -203,7 +203,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       value: _selectedBloodType,
       decoration: InputDecoration(
         labelText: "Groupe Sanguin",
-        prefixIcon: const Icon(Icons.bloodtype, color: Color(0xFF86B7D7)),
+        prefixIcon: const Icon(Icons.bloodtype, color: Color(0xFF81C784)),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       items: _bloodTypes
@@ -229,7 +229,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       maxLines: maxLines,
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF86B7D7)),
+        prefixIcon: Icon(icon, color: const Color(0xFF81C784)),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
       validator: (value) {

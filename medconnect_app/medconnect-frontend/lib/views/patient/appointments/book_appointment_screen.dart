@@ -76,7 +76,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Prendre Rendez-vous'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
       ),
       body: Stepper(
         type: StepperType.horizontal,
@@ -91,7 +91,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 ElevatedButton(
                   onPressed: details.onStepContinue,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF567991),
+                    backgroundColor: const Color(0xFF388E3C),
                     foregroundColor: Colors.white,
                   ),
                   child: const Text('Suivant'),
@@ -186,11 +186,11 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
             final isSelected = _selectedDoctorId == doc.id;
             return Card(
               color: isSelected
-                  ? const Color(0xFF567991).withOpacity(0.1)
+                  ? const Color(0xFF388E3C).withOpacity(0.1)
                   : Colors.white,
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: const Color(0xFF567991),
+                  backgroundColor: const Color(0xFF388E3C),
                   child: Text(
                     doc.firstName.isNotEmpty ? doc.firstName[0] : 'D',
                     style: const TextStyle(color: Colors.white),
@@ -200,14 +200,14 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(doc.speciality, style: const TextStyle(color: Color(0xFF567991))),
+                    Text(doc.speciality, style: const TextStyle(color: Color(0xFF388E3C))),
                     if (doc.bio != null && doc.bio!.isNotEmpty)
                       Text(doc.bio!, maxLines: 2, overflow: TextOverflow.ellipsis),
                     Text("Tarif: ${doc.consultationFee.toStringAsFixed(0)} DH", style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 trailing: isSelected
-                    ? const Icon(Icons.check_circle, color: Color(0xFF567991))
+                    ? const Icon(Icons.check_circle, color: Color(0xFF388E3C))
                     : null,
                 onTap: () {
                   setState(() {
@@ -275,7 +275,7 @@ class _BookAppointmentScreenState extends State<BookAppointmentScreen> {
                 onSelected: (selected) {
                   setState(() => _selectedTime = selected ? slot : null);
                 },
-                selectedColor: const Color(0xFF567991),
+                selectedColor: const Color(0xFF388E3C),
                 labelStyle: TextStyle(
                   color: isSelected ? Colors.white : Colors.black,
                 ),

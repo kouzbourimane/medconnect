@@ -142,7 +142,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: Consumer<MedicalDocumentViewModel>(
           builder: (context, viewModel, child) {
@@ -172,7 +172,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
             );
           },
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         elevation: 0,
       ),
       body: Column(
@@ -256,7 +256,7 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showUploadDialog,
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         child: const Icon(Icons.add_a_photo, color: Colors.white),
       ),
     );
@@ -298,9 +298,9 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
           viewModel.setFilter(label);
         }
       },
-      selectedColor: const Color(0xFF567991).withOpacity(0.2),
+      selectedColor: const Color(0xFF388E3C).withOpacity(0.2),
       labelStyle: TextStyle(
-        color: isSelected ? const Color(0xFF567991) : Colors.black,
+        color: isSelected ? const Color(0xFF388E3C) : Colors.black,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
     );

@@ -45,10 +45,10 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen>
     final viewModel = Provider.of<DoctorAppointmentViewModel>(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text('Gestion des Rendez-vous'),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: Colors.white,
@@ -78,7 +78,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen>
             MaterialPageRoute(builder: (context) => const DoctorCalendarScreen()),
           );
         },
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         child: const Icon(Icons.calendar_month),
       ),
     );
@@ -177,7 +177,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen>
                       ElevatedButton(
                         onPressed: () => _handleAction(context, appt, 'accept'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF567991),
+                          backgroundColor: const Color(0xFF388E3C),
                           foregroundColor: Colors.white,
                         ),
                         child: const Text('Accepter'),
@@ -233,7 +233,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen>
       case Appointment.statusRefused:
         return Colors.red;
       case Appointment.statusCompleted:
-        return Colors.blue;
+        return Colors.green;
       default:
         return Colors.grey;
     }

@@ -18,8 +18,8 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
 
     return Scaffold(
       backgroundColor: const Color(
-        0xFFF5F9FC,
-      ), // Very light blue/grey background
+        0xFFF1F8E9,
+      ), // Very light green/grey background
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -30,7 +30,7 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
               const Icon(
                 Icons.health_and_safety,
                 size: 80,
-                color: Color.fromARGB(255, 86, 121, 145),
+                color: Color(0xFF388E3C),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -38,7 +38,7 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF2C3E50),
+                  color: Color(0xFF1B5E20),
                 ),
               ),
               const SizedBox(height: 40),
@@ -50,7 +50,7 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                   side: BorderSide(
-      color: Color.fromARGB(255, 86, 121, 145), // Votre couleur médicale bleue
+      color: Color(0xFF388E3C), // Votre couleur médicale bleue
       width: 1.5, // Épaisseur de la bordure
     ),
                 ),
@@ -61,7 +61,7 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
                       // Toggle Switch
                       Container(
                         decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 224, 234, 240),
+                          color: const Color(0xFFE8F5E9),
                           borderRadius: BorderRadius.circular(15),
                         ),
                         child: Row(
@@ -77,7 +77,7 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: !_isPatientSelected
-                                        ? Color.fromARGB(255, 86, 121, 145)
+                                        ? Color(0xFF388E3C)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(15),
                                     boxShadow: !_isPatientSelected
@@ -118,7 +118,7 @@ class _CombinedLoginScreenState extends State<CombinedLoginScreen> {
                                   ),
                                   decoration: BoxDecoration(
                                     color: _isPatientSelected
-                                        ? Color.fromARGB(255, 86, 121, 145)
+                                        ? Color(0xFF388E3C)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(15),
                                     boxShadow: _isPatientSelected

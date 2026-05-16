@@ -55,13 +55,13 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
     final userName = user?.firstName ?? 'Patient';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: Text(
           'Bonjour, $userName',
           style: const TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         actions: [
           Stack(
             children: [
@@ -127,7 +127,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
+                        color: Color(0xFF1B5E20),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -138,7 +138,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF2C3E50),
+                        color: Color(0xFF1B5E20),
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -149,7 +149,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
             ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: const Color(0xFF567991),
+        selectedItemColor: const Color(0xFF388E3C),
         unselectedItemColor: Colors.grey,
         currentIndex: 0,
         items: const [
@@ -218,11 +218,11 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                     : "P",
                 style: const TextStyle(
                   fontSize: 40.0,
-                  color: Color(0xFF567991),
+                  color: Color(0xFF388E3C),
                 ),
               ),
             ),
-            decoration: const BoxDecoration(color: Color(0xFF567991)),
+            decoration: const BoxDecoration(color: Color(0xFF388E3C)),
           ),
           ListTile(
             leading: const Icon(Icons.dashboard),
@@ -324,7 +324,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
   Widget _buildInfoItem(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFF86B7D7), size: 28),
+        Icon(icon, color: const Color(0xFF81C784), size: 28),
         const SizedBox(height: 4),
         Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
         Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
@@ -349,14 +349,14 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
                 ? "${nextAppt.date.split('T')[0]}\n${nextAppt.doctorName}"
                 : "Aucun RDV",
             Icons.calendar_month,
-            const Color(0xFF567991),
+            const Color(0xFF388E3C),
           ),
           const SizedBox(width: 12),
           _buildSummaryCard(
             "Messages",
             "$msgCount non lus",
             Icons.message,
-            const Color(0xFF86B7D7),
+            const Color(0xFF81C784),
             () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -443,7 +443,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
           context,
           "Prendre RDV",
           Icons.add_alarm,
-          Colors.blue,
+          Colors.green,
           () => Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const BookAppointmentScreen()),
@@ -531,7 +531,7 @@ class _PatientDashboardScreenState extends State<PatientDashboardScreen> {
         final notif = notifications[i];
         return ListTile(
           leading: CircleAvatar(
-            backgroundColor: const Color(0xFFF5F9FC),
+            backgroundColor: const Color(0xFFF1F8E9),
             child: Icon(Icons.notifications_none, color: Colors.grey[600]),
           ),
           title: Text(

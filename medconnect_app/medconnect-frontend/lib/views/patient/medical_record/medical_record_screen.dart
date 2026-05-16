@@ -42,13 +42,13 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F9FC),
+      backgroundColor: const Color(0xFFF1F8E9),
       appBar: AppBar(
         title: const Text(
           'Mon Dossier Médical',
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF567991),
+        backgroundColor: const Color(0xFF388E3C),
         elevation: 0,
         actions: [
           IconButton(
@@ -129,7 +129,7 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen>
           icon: const Icon(Icons.picture_as_pdf),
           label: const Text('EXPORTER LE DOSSIER COMPLET (PDF)'),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF567991),
+            backgroundColor: const Color(0xFF388E3C),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12),
             shape: RoundedRectangleBorder(
@@ -206,7 +206,7 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen>
           ),
           child: ExpansionTile(
             leading: const CircleAvatar(
-              backgroundColor: Color(0xFF86B7D7),
+              backgroundColor: Color(0xFF81C784),
               child: Icon(Icons.calendar_today, color: Colors.white, size: 20),
             ),
             title: Text(
@@ -282,7 +282,7 @@ class _MedicalRecordScreenState extends State<MedicalRecordScreen>
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF567991),
+                color: Color(0xFF388E3C),
               ),
             ),
             const Divider(),
